@@ -9,6 +9,18 @@ $container['renderer'] = function ($c) {
     return new Slim\Views\PhpRenderer($settings['template_path']);
 };
 
+// view renderer twig
+$container['view'] = function ($c) {
+	$settings = $c->get('settings')['renderer'];
+    $view = new \Slim\Views\Twig($settings['template_path']);
+    $view->addExtension(new \Slim\Views\TwigExtension(
+        $c['router'],
+        $c['request']->getUri()
+    ));
+
+    return $view;
+};
+
 // monolog
 $container['logger'] = function ($c) {
     $settings = $c->get('settings')['logger'];
