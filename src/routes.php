@@ -1,37 +1,38 @@
 <?php
+use \FileHosting\Models;
+use \FileHosting\Helpers\Helper;
 
 $app->get('/[upload]', function ($request, $response, $args) {
-    // Sample log message
-    $this->logger->info("/[upload]");
-
-    // Render index view
+    $this->logger->info("Главная страница");
     return $this->view->render($response, 'upload.html', $args);
 });
 
 
-
-
 $app->post('/upload', function ($request, $response, $args) {
-    // Sample log message
-    $this->logger->info("Нажата кнопка отправить в upload.html");
+    $this->logger->info("Кнопка: отправить файл");
 
-	// Каталог, в который мы будем принимать файл:
-	$uploaddir='../files/'.date("Y").'/'.date("m").'/'.date("d").'/';
-	$file_to_upload = $uploaddir.basename($_FILES['file_to_upload']['name']);
+    #var_dump($_FILES);
+//Создаём объект FileModel
+    $file=new Models\FileModel();
 
-	if (!file_exists($uploaddir)) {
-		mkdir($uploaddir,0777,true);
-	}
-	//Делаем исполняемые неисполняемыми
-	if (preg_match("/^(\w|\s)*(.)(php|phtml|html|js)$/iu", $_FILES['file_to_upload']['name'])){
-		$file_to_upload.='.txt';
-	}
-	// Копируем файл из каталога для временного хранения файлов:
-	$args['status']=false;
-	if (copy($_FILES['file_to_upload']['tmp_name'], $file_to_upload)){
-		$args['status']=true;
-	}
+    $file->setName($_FILES['file_to_upload']['name']);
+    $file->size=$_FILES['file_to_upload']['size'];
+    $file->comment=$_POST['comment'];
+    var_dump($file);
+//Записываем в БД
+    $this->filesGW->addFile($file);
+//Копируем файл на сервер
+    $args['status']=$this->filesFM->addFile($file); //FM - FileManager
 
-	// Render index view
+	//Представление
     return $this->view->render($response, 'upload.html', $args);
+});
+
+
+$app->get('/show_files', function ($request, $response, $args) {
+    $this->logger->info("Страница последних загрузок");
+
+    $args['files']=$this->filesGW->getLastFiles(100);
+
+    return $this->view->render($response, 'show_files.html', $args);
 });

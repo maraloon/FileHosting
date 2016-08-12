@@ -14,5 +14,13 @@ return [
             'name' => 'slim-app',
             'path' => __DIR__ . '/../logs/app.log',
         ],
+
+        //PDO Connection
+        'db'=> [
+            'host'=>'localhost',
+            'dbname'=>'filehosting',
+            'user'=>'root',
+            'pass'=>'',
+        ]
     ],
 ];

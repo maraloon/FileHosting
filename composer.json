@@ -6,5 +6,13 @@
         "monolog/monolog": "^1.17",
         "twig/twig": "~1.0",
         "slim/twig-view": "^2.1"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "FileHosting\\": "src/classes",
+            "FileHosting\\Helpers\\": "src/classes/helpers/",
+            "FileHosting\\Models\\": "src/classes/models/"
+        }
     }
 }
