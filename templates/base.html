@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>{% block title %}{% endblock %} - FileHosting</title>
+    </head>
+    <body>
+    	<div id="content">
+    	{% block content %}
+    		<h1>{% block h1 %}{% endblock %}</h1>
+    	{% endblock %}
+    	</div>
+
+    	<div id="footer">
+            {% block footer %}
+            	<br>
+            	<a href="{{ path_for('show_files') }}">Последние загруженные файлы</a>
+				<a href="{{ path_for('main') }}">Главная</a>
+				<br>
+
+                <a href='https://gist.github.com/codedokode/9424217'>Техническое задание</a>
+                <a href='https://github.com/TheSidSpears/FileHosting'>Git</a> проекта
+            {% endblock %}
+        </div>
+    </body>
+</html>

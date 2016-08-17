@@ -35,7 +35,6 @@ class FilesTDGW{
 		$rows->execute();
 
 		$filesRow=$rows->fetchAll(\PDO::FETCH_ASSOC);
-		//return $filesRow;
 
 		//Подготавливаем массив
 		$files=array();
@@ -45,5 +44,18 @@ class FilesTDGW{
 			$files[]=$file;
 		}
 		return $files;
+	}
+
+	public function getFile($id){
+		$rows = $this->db->prepare("SELECT * FROM `files` WHERE `id`=:id");
+		$rows->bindValue(':id', $id, \PDO::PARAM_INT);
+		$rows->execute();
+
+		$fileRow=$rows->fetch(\PDO::FETCH_ASSOC);
+
+		$file=new FileModel();
+		$file->addInfo($fileRow);
+
+		return $file;
 	}
 }

@@ -15,6 +15,9 @@ return [
             'path' => __DIR__ . '/../logs/app.log',
         ],
 
+        //Path of uploaded files
+        'upload_folder'=>'files/',
+
         //PDO Connection
         'db'=> [
             'host'=>'localhost',

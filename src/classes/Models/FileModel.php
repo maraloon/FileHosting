@@ -11,7 +11,7 @@ class FileModel{
 	public $comment;
 
 	function __construct(){
-		$this->path=Helper::getAbsolutePath('/files/').date("Y").'/'.date("m").'/'.date("d").'/';
+		$this->path=date("Y").'/'.date("m").'/'.date("d").'/';
 		$this->time=time();
 	}
 
@@ -22,6 +22,9 @@ class FileModel{
 
 	public function setId($id){
 		$this->id=$id;
+	}
+	public function getId(){
+		return $this->id;
 	}
 
 	public function addInfo($infoArray){
@@ -49,5 +52,12 @@ class FileModel{
 			return $mb.' Mb';
 		}
 		return $kb.' Kb';
+	}
+
+	public function isImage(){
+		if (preg_match("/^((\w)|(\d)|[ -_])*(.)(jpg|jpeg|png|gif)$/iu",$this->original_name)==1) {
+			return true;
+		}
+		return false;
 	}
 }

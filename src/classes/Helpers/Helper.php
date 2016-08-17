@@ -33,7 +33,7 @@ class Helper{
 	}
 
 	static function execDisable($file_name){
-		if (preg_match("/^(\w|\s)*(.)(php|phtml|html|js)$/iu", $file_name)){
+		if (preg_match("/^((\w)|(\d)|[ -_])*(.)(php|phtml|html|js)$/iu", $file_name)){
 			$file_name.='.txt';
 		}
 		return $file_name;

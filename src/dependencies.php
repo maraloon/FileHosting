@@ -24,7 +24,7 @@ $container['view'] = function ($c) {
  * DataBase PDO Connection
  */
 $container['db'] = function ($c) {
-    $db = $c['settings']['db'];
+    $db = $c->get('settings')['db'];
     $pdo = new PDO(
         "mysql:host=".$db['host'].
         ";dbname=".$db['dbname'],

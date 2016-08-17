@@ -1,36 +1,30 @@
-{{ include('head.html') }}
-<h1>Последние загрузки</h1>
+{% extends "base.html" %}
 
-<table class="table table-striped">
-	
-	<thead>
-		<tr>
-			<th>Название</th>
-			<th>Дата</th>
-			<th>Размер</th>
-		</tr>
-	</thead>
-	
-	<tbody>
+{% block title %}Show Files{% endblock %}
+{% block h1 %}Последние загрузки{% endblock %}
+
+{% block content %}
+    {{ parent() }}
+
+    {% if files|length == 0 %}
+    	<p>База пуста</p>
+    {% else %}
 		{% for file in files %}
-		<tr>
-			<td>{{ file.name }}</td>
-			<td>{{ file.time }}</td>
-			<td>{{ file.showSize() }}</td>
-		</tr>
+			<div class="file_card">
+				{% if file.isImage() == true %}
+					<div class="preview">
+						<img height="100" src="{{ upload_folder }}{{ file.path }}{{ file.name }}">
+					</div>
+				{% endif %}
+
+				<div class="name">{{ file.original_name }}</div>
+				<div class="time">{{ file.time }}</div>
+				<div class="size">{{ file.showSize() }}</div>
+				<div class="time">{{ file.comment }}</div>
+				<div class="download">
+					<a href="{{ path_for('download', { 'id': file.getId() }) }}">Скачать</a>
+				</div>	
+			</div>
 		{% endfor %}
-	</tbody>
-</table>
-
-{% for file in files %}
-<div class="file_card">
-	<div class="preview"><img src=""></div>
-	<div class="name">{{ file.name }}</div>
-	<div class="time">{{ file.time }}</div>
-	<div class="size">{{ file.showSize() }}</div>
-	<div class="download"><a href="">Скачать</a></div>
-</div>
-{% endfor %}
-
-{{ include('urls.html') }}
-{{ include('foot.html') }}
+	{% endif %}
+{% endblock %}

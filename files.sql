@@ -28,21 +28,21 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `files` (
   `id` int(11) NOT NULL,
-  `path` varchar(3000) CHARACTER SET latin1 NOT NULL,
-  `name` varchar(255) CHARACTER SET latin1 NOT NULL,
-  `original_name` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `path` varchar(3000) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `original_name` varchar(255) NOT NULL,
   `size` int(11) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `comment` varchar(3000) CHARACTER SET latin1 NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_mysql500_ci;
+  `comment` varchar(3000) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `files`
 --
 
 INSERT INTO `files` (`id`, `path`, `name`, `original_name`, `size`, `time`, `comment`) VALUES
-(3, 'D:\\xampp\\htdocs\\filehosting\\files\\2016\\08\\11\\', '2.png', '2.png', 20462, '2016-08-11 20:36:32', 'sfbdf'),
-(4, 'D:\\xampp\\htdocs\\filehosting\\files2016/08/12/', 'Front+Cover+copy.png', 'Front+Cover+copy.png', 1770923, '2016-08-12 02:11:34', 'sd');
+(1, 'D:\\xampp\\htdocs\\filehosting\\files\\2016\\08\\11\\', '2.png', '2.png', 20462, '2016-08-11 20:36:32', 'sfbdf'),
+(2, 'D:\\xampp\\htdocs\\filehosting\\files2016/08/12/', 'Front+Cover+copy.png', 'Front+Cover+copy.png', 1770923, '2016-08-12 02:11:34', 'sd');
 
 --
 -- Индексы сохранённых таблиц
@@ -62,7 +62,7 @@ ALTER TABLE `files`
 -- AUTO_INCREMENT для таблицы `files`
 --
 ALTER TABLE `files`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

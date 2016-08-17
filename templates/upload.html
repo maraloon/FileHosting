@@ -1,21 +1,23 @@
-{{ include('head.html') }}
-<h1>Страница загрузки (главная)</h1>
+{% extends "base.html" %}
 
-    {% if status is defined %}
-        {% if status %}
-            <p>Файл успешно загружен</p>
+{% block title %}Upload{% endblock %}
+{% block h1 %}Страница загрузки (главная){% endblock %}
+
+{% block content %}
+    {{ parent() }}
+        {% if status is defined %}
+            {% if status %}
+                <p>Файл успешно загружен</p>
+            {% else %}
+                <p>Ошибка: файл не загружен</p>
+            {% endif %}  
+            <a href="upload">Загрузить еще</a>
+
         {% else %}
-            <p>Ошибка: файл не загружен</p>
-        {% endif %}  
-        <a href="upload">Загрузить еще</a>
-
-    {% else %}
-        <form role="form" class="form-horizontal" method='post' action='upload' enctype=multipart/form-data>
-            <input type="file" name="file_to_upload">
-            <input type="text" name="comment" placeholder="Ваш комментарий">
-            <button class="btn btn-primary btn-lg" type="submit">Загрузить</button>
-        </form>
-    {% endif %}
-
-{{ include('urls.html') }}
-{{ include('foot.html') }}
+            <form role="form" class="form-horizontal" method='post' action='upload' enctype=multipart/form-data>
+                <input type="file" name="file_to_upload">
+                <input type="text" name="comment" placeholder="Ваш комментарий">
+                <button class="btn btn-primary btn-lg" type="submit">Загрузить</button>
+            </form>
+        {% endif %}
+{% endblock %}
