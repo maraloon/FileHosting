@@ -57,5 +57,15 @@ class FilesTDGW{
 		$file->addInfo($fileRow);
 
 		return $file;
+
+
+
+		if ($fileRow!=NULL) {
+			$file=new FileModel();
+			$file->addInfo($fileRow);
+
+			return $file;
+		}
+		return false;
 	}
 }

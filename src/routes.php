@@ -29,14 +29,27 @@ $app->post('/upload', function ($request, $response, $args) {
 });
 
 
-$app->get('/show_files', function ($request, $response, $args){
+$app->get('/files_list', function ($request, $response, $args){
     $this->logger->info("Страница последних загрузок");
 
     $args['upload_folder']=$this->settings['upload_folder'];
     $args['files']=$this->filesGW->getLastFiles(100);
 
-    return $this->view->render($response, 'show_files.html', $args);
-})->setName('show_files');
+    return $this->view->render($response, 'files_list.html', $args);
+})->setName('files_list');
+
+
+
+$app->get('/show_file/{id}', function ($request, $response, $args){
+    $this->logger->info("Просмотр файла");
+
+    $args['upload_folder']=$this->settings['upload_folder'];
+    $args['file']=$this->filesGW->getFile($args['id']);
+
+    return $this->view->render($response, 'show_file.html', $args);
+})->setName('show_file');
+
+
 
 
 
@@ -44,7 +57,7 @@ $app->get('/download/{id}', function ($request, $response, $args) {
     $this->logger->info("Загрузка файла");
     
     $file=$this->filesGW->getFile($args['id']);
-    
+
     $url=implode('/',explode('/', $_SERVER['PHP_SELF'],-1)).'/';
     $url.=$this->settings['upload_folder'];
     $url.=$file->path;

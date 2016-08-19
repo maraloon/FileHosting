@@ -16,8 +16,7 @@ return [
         ],
 
         //Path of uploaded files
-        'upload_folder'=>'files/',
-
+        'upload_folder'=>'/filehosting/public/files/',
         //PDO Connection
         'db'=> [
             'host'=>'localhost',

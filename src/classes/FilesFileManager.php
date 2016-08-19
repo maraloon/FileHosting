@@ -8,7 +8,7 @@ class FilesFileManager{
 	 */
 	public function addFile(\FileHosting\Models\FileModel $file, string $upload_folder){
 		// Каталог, в который мы будем принимать файл:
-		$uploaddir=$upload_folder.$file->path;
+		$uploaddir=$_SERVER['DOCUMENT_ROOT'].$upload_folder.$file->path;
 		$file_to_upload = $uploaddir.basename($file->name);
 		//Если папки нет -> создаём
 		if (!file_exists($uploaddir)) {

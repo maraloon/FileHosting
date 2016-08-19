@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Show File{% endblock %}
+{% block h1 %}Просмотр файла{% endblock %}
+
+{% block content %}
+    {{ parent() }}
+
+    {% if file == false %}
+    	<p>Такого файла не существует</p>
+    {% else %}
+		<div class="file_card">
+			{% if file.isImage() == true %}
+				<div class="preview">
+					<img height="100" src="{{ upload_folder }}{{ file.path }}{{ file.name }}">
+				</div>
+			{% endif %}
+
+			<div class="name">{{ file.original_name }}</div>
+			<div class="time">{{ file.time }}</div>
+			<div class="size">{{ file.showSize() }}</div>
+			<div class="time">{{ file.comment }}</div>
+			<div class="download">
+				<a href="{{ path_for('download', { 'id': file.getId() }) }}">Скачать</a>
+			</div>	
+		</div>
+	{% endif %}
+{% endblock %}
