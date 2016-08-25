@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}Show File{% endblock %}
+
+{% block scripts %}
+	<script src="{{ project_folder }}/public/js/uppod.js" type="text/javascript"></script>
+{% endblock %}
+
 {% block h1 %}Просмотр файла{% endblock %}
 
 {% block content %}
@@ -10,19 +15,47 @@
     	<p>Такого файла не существует</p>
     {% else %}
 		<div class="file_card">
-			{% if file.isImage() == true %}
+			{% if file.getType() == 'image' %}
 				<div class="preview">
-					<img height="100" src="{{ upload_folder }}{{ file.path }}{{ file.name }}">
+					<img height="100" src="{{ file_path }}">
 				</div>
+			{% elseif file.getType() == 'audio' or file.getType() == 'video' %}
+				<div class="player" id="uppod_player"></div>
+				<script type="text/javascript">this.player = new Uppod({m:"{{ file.getType() }}",uid:"uppod_player",file:"{{ file_path }}"});</script>
 			{% endif %}
 
 			<div class="name">{{ file.original_name }}</div>
 			<div class="time">{{ file.time }}</div>
 			<div class="size">{{ file.showSize() }}</div>
-			<div class="time">{{ file.comment }}</div>
+			<div class="time">{{ file.description }}</div>
 			<div class="download">
 				<a href="{{ path_for('download', { 'id': file.getId() }) }}">Скачать</a>
-			</div>	
+			</div>
+
+			<div class="comments">
+				<h2>Комментарии</h2>
+					{% for comment in comments %}
+						<p>
+							{{ comment.time }}
+							
+							{% if comment.nick == NULL %}
+								Anon
+							{% else %}
+								{{ comment.nick }}
+							{% endif %}
+
+							{{ comment.text }}
+						</p>
+					{% endfor %}
+
+				<h3>Добавить комментарий</h3>
+				<form method='post' action="{{ path_for('add_comment') }}">
+					<input type="text" name="comment">
+					<input type="text" name="nick" placeholder="Anon">
+					<input type="hidden" name="file_id" value="{{ file.getId() }}">
+					<button type="submit">Комментировать</button>
+				</form>
+			</div>
 		</div>
 	{% endif %}
 {% endblock %}

@@ -13,19 +13,17 @@ class FilesTDGW{
 	 * @return bool status of adding to DB
 	 */
 	public function addFile(FileModel $file){
-		echo "FilesTDGW->add";
-		//var_dump($file);
 		$SqlString="INSERT INTO `files`
-				(`name`,`original_name`,`path`,`size`,`comment`)
+				(`name`,`original_name`,`path`,`size`,`description`)
 				VALUES
-				(:name,:original_name,:path,:size,:comment)";
+				(:name,:original_name,:path,:size,:description)";
 
 		$rows = $this->db->prepare($SqlString);
 		$rows->bindValue(':name', $file->name, \PDO::PARAM_STR);
 		$rows->bindValue(':original_name', $file->original_name, \PDO::PARAM_STR);
 		$rows->bindValue(':path', $file->path, \PDO::PARAM_STR);
 		$rows->bindValue(':size', $file->size, \PDO::PARAM_INT);
-		$rows->bindValue(':comment', $file->comment, \PDO::PARAM_STR);
+		$rows->bindValue(':description', $file->description, \PDO::PARAM_STR);
 		$rows->execute();
 	}
 
@@ -52,13 +50,6 @@ class FilesTDGW{
 		$rows->execute();
 
 		$fileRow=$rows->fetch(\PDO::FETCH_ASSOC);
-
-		$file=new FileModel();
-		$file->addInfo($fileRow);
-
-		return $file;
-
-
 
 		if ($fileRow!=NULL) {
 			$file=new FileModel();

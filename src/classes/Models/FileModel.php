@@ -8,11 +8,11 @@ class FileModel{
 	public $path;
 	public $size;
 	public $time;
-	public $comment;
+	public $description;
 
 	function __construct(){
 		$this->path=date("Y").'/'.date("m").'/'.date("d").'/';
-		$this->time=time();
+		//$this->time=time();
 	}
 
 	public function setName(string $name){
@@ -27,8 +27,8 @@ class FileModel{
 		return $this->id;
 	}
 
-	public function addInfo($infoArray){
-		foreach($infoArray as $key=>$value){			
+	public function addInfo($info_array){
+		foreach($info_array as $key=>$value){			
 			$object_vars=get_object_vars($this);
 			//Если есть переменная в объекте
 			if(array_key_exists($key,$object_vars)){
@@ -40,8 +40,8 @@ class FileModel{
 			}
 		}
 
-		if(isset($infoArray['id'])){
-			$this->setId($infoArray['id']);
+		if(isset($info_array['id'])){
+			$this->setId($info_array['id']);
 		}
 	}
 
@@ -54,10 +54,20 @@ class FileModel{
 		return $kb.' Kb';
 	}
 
-	public function isImage(){
-		if (preg_match("/^((\w)|(\d)|[ -_])*(.)(jpg|jpeg|png|gif)$/iu",$this->original_name)==1) {
-			return true;
+	public function getType(){
+
+		$map = array(
+			'image' => 'jpg|jpeg|png|gif',
+			'audio' => 'mp3',
+			'video' => 'mp4',
+			);
+
+		foreach ($map as $type => $extension_list) {
+			if (preg_match("/^((\w)|(\d)|[ -_])*(.)(".$extension_list.")$/iu",$this->original_name)==1) {
+				return $type;
+			}
 		}
-		return false;
+		return 'other';
+
 	}
 }

@@ -38,12 +38,17 @@ $container['db'] = function ($c) {
 };
 
 
-$container['filesGW'] = function ($c) {
+$container['files_GW'] = function ($c) {
     return new \FileHosting\DataBase\FilesTDGW($c['db']);
 };
 
-$container['filesFM'] = function ($c) {
+$container['files_FM'] = function ($c) {
     return new \FileHosting\FilesFileManager($c['db']);
+};
+
+
+$container['comments_GW'] = function ($c) {
+    return new \FileHosting\DataBase\CommentsTDGW($c['db']);
 };
 
 // monolog

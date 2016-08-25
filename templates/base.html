@@ -3,6 +3,8 @@
     <head>
         <meta charset="utf-8"/>
         <title>{% block title %}{% endblock %} - FileHosting</title>
+        {% block scripts %}{% endblock %}
+        
     </head>
     <body>
     	<div id="content">
@@ -15,7 +17,7 @@
             {% block footer %}
             	<br>
             	<a href="{{ path_for('files_list') }}">Последние загруженные файлы</a>
-				<a href="{{ path_for('main') }}">Главная</a>
+				<a href="{{ path_for('main') }}">Загрузить</a>
 				<br>
 
                 <a href='https://gist.github.com/codedokode/9424217'>Техническое задание</a>

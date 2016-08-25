@@ -1,4 +1,7 @@
 <?php
+
+$project_folder='filehosting';
+
 return [
     'settings' => [
         'displayErrorDetails' => true, // set to false in production
@@ -16,7 +19,8 @@ return [
         ],
 
         //Path of uploaded files
-        'upload_folder'=>'/filehosting/public/files/',
+        'project_folder'    => "/$project_folder",
+        'upload_folder'=>"/$project_folder/public/files/",
         //PDO Connection
         'db'=> [
             'host'=>'localhost',
