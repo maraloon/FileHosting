@@ -53,7 +53,11 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
         $args['file_path']=$this->settings['upload_folder'].$file->path.$file->name;
 
         $comments=$this->comments_GW->getComments($args['id']);
+
+        $comments_tree=$this->commentsTree->makeTree($comments);
+        $comments=$this->commentsTree->sortComments($comments,array(),$comments_tree,0);
         $args['comments']=$comments;
+        
     }
 
     return $this->view->render($response, 'show_file.html', $args);
@@ -96,30 +100,3 @@ $app->post('/add_comment', function ($request, $response, $args){
     $response = $response->withHeader('Location', $url);
     return $this->view->render($response, 'show_file.html', $args);
 })->setName('add_comment');
-
-
-/*
-$comments = array(  '1' => array('Первый',0),
-                    '2' => array('Второй',0),
-                    '3' => array('Первый к первому',1),
-                    '4' => array('Первый к 3',3),
-                    '5' => array('Второй к 3',3),
-                );
-
-$comments = array(  [1] => array('text'=>'1',
-                        'comments'=>array(
-                                        [1]=>array(
-                                            'text'=>'1->1',
-                                            'comments'=>array(
-                                                        [1]=array('text'=>'1->1->1','comments'=>array()
-                                                                  )
-                                                             )
-                                                  )
-                                          )
-                                ),
-                    
-
-                    [2] => array('text'=>'2','comments'=>array()),
-
-                );
-*/

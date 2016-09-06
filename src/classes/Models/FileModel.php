@@ -58,8 +58,8 @@ class FileModel{
 
 		$map = array(
 			'image' => 'jpg|jpeg|png|gif',
-			'audio' => 'mp3',
-			'video' => 'mp4',
+			'audio' => 'mp3|ogg|wav|wv|aac|aiff|ape|flac|dts|wma|midi',
+			'video' => 'mp4|avi|wmv|webm|3gp',
 			);
 
 		foreach ($map as $type => $extension_list) {

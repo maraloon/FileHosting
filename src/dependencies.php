@@ -46,9 +46,12 @@ $container['files_FM'] = function ($c) {
     return new \FileHosting\FilesFileManager($c['db']);
 };
 
-
 $container['comments_GW'] = function ($c) {
     return new \FileHosting\DataBase\CommentsTDGW($c['db']);
+};
+
+$container['commentsTree'] = function ($c) {
+    return new \FileHosting\Models\CommentsTreeModel();
 };
 
 // monolog

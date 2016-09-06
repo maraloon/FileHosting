@@ -36,15 +36,21 @@
 				<h2>Комментарии</h2>
 					{% for comment in comments %}
 						<p>
-							{{ comment.time }}
-							
-							{% if comment.nick == NULL %}
-								Anon
-							{% else %}
-								{{ comment.nick }}
+							{% if comment.deep != 0 %}
+								{% for i in 0..comment.deep %}
+									<font color='white'>###</font>
+								{% endfor %}
 							{% endif %}
 
-							{{ comment.text }}
+							{{ comment.comment.time }}
+							
+							{% if comment.comment.nick == NULL %}
+								Anon
+							{% else %}
+								{{ comment.comment.nick }}
+							{% endif %}
+
+							{{ comment.comment.text }}
 						</p>
 					{% endfor %}
 

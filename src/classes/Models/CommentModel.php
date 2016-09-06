@@ -4,7 +4,7 @@ namespace FileHosting\Models;
 class CommentModel{
 	protected $id;
 	public $file_id;
-	//public $parent_id;
+	public $parent_id;
 	public $text;
 	public $nick;
 	public $time;
