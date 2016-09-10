@@ -4,7 +4,7 @@ use \FileHosting\Helpers\Helper;
 class FileModel{
 	protected $id;
 	public $name;
-	public $original_name;
+	public $originalName;
 	public $path;
 	public $size;
 	public $time;
@@ -16,7 +16,7 @@ class FileModel{
 	}
 
 	public function setName(string $name){
-		$this->original_name=$name;
+		$this->originalName=$name;
 		$this->name=Helper::execDisable(Helper::transliterate($name));
 	}
 
@@ -27,11 +27,11 @@ class FileModel{
 		return $this->id;
 	}
 
-	public function addInfo($info_array){
-		foreach($info_array as $key=>$value){			
-			$object_vars=get_object_vars($this);
+	public function addInfo($infoArray){
+		foreach($infoArray as $key=>$value){			
+			$objectVars=get_object_vars($this);
 			//Если есть переменная в объекте
-			if(array_key_exists($key,$object_vars)){
+			if(array_key_exists($key,$objectVars)){
 				//Если значение из массива не пустое
 				if(isset($value) and ($value!=NULL)){
 					//Передать значение объекту
@@ -40,8 +40,8 @@ class FileModel{
 			}
 		}
 
-		if(isset($info_array['id'])){
-			$this->setId($info_array['id']);
+		if(isset($infoArray['id'])){
+			$this->setId($infoArray['id']);
 		}
 	}
 
@@ -62,8 +62,8 @@ class FileModel{
 			'video' => 'mp4|avi|wmv|webm|3gp',
 			);
 
-		foreach ($map as $type => $extension_list) {
-			if (preg_match("/^((\w)|(\d)|[ -_])*(.)(".$extension_list.")$/iu",$this->original_name)==1) {
+		foreach ($map as $type => $extensionList) {
+			if (preg_match("/^((\w)|(\d)|[ -_])*(.)(".$extensionList.")$/iu",$this->originalName)==1) {
 				return $type;
 			}
 		}

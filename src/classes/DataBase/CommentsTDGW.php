@@ -14,41 +14,34 @@ class CommentsTDGW{
 	 */
 	public function addComment( CommentModel $comment){
 		$SqlString="INSERT INTO `comments`
-				(`text`,`nick`,`file_id`)
+				(`text`,`nick`,`fileId`,`parentId`)
 				VALUES
-				(:text,:nick,:file_id)";
+				(:text,:nick,:fileId,:parentId)";
 
 		$rows = $this->db->prepare($SqlString);
 		$rows->bindValue(':text', $comment->text, \PDO::PARAM_STR);
 		$rows->bindValue(':nick', $comment->nick, \PDO::PARAM_STR);
-		$rows->bindValue(':file_id', $comment->file_id, \PDO::PARAM_INT);
+		$rows->bindValue(':fileId', $comment->fileId, \PDO::PARAM_INT);
+		$rows->bindValue(':parentId', $comment->parentId, \PDO::PARAM_INT);
 		$rows->execute();
 	}
 
-	public function getComments(int $file_id){
+	public function getComments(int $fileId){
 
-		$rows = $this->db->prepare("SELECT * FROM `comments` WHERE `file_id`=:file_id");
-		$rows->bindValue(':file_id', $file_id, \PDO::PARAM_INT);
+		$rows = $this->db->prepare("SELECT * FROM `comments` WHERE `fileId`=:fileId");
+		$rows->bindValue(':fileId', $fileId, \PDO::PARAM_INT);
 		$rows->execute();
 
-		$comments_row=$rows->fetchAll(\PDO::FETCH_ASSOC);
+		$commentsRow=$rows->fetchAll(\PDO::FETCH_ASSOC);
 
 		//Подготавливаем массив
 		$comments=array();
-		foreach($comments_row as $comment_row){
+		foreach($commentsRow as $commentRow){
 			$comment=new CommentModel();
-			$comment->addInfo($comment_row);
+			$comment->addInfo($commentRow);
 			$comments[]=$comment;
 		}
 		return $comments;
-		/*
-		if ($comment_row!=NULL) {
-			$comment=new CommentModel();
-			$comment->addInfo($comment_row);
-
-			return $comment;
-		}
-		return false;*/
 	}
 	
 }

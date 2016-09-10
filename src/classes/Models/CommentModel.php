@@ -3,8 +3,8 @@ namespace FileHosting\Models;
 //use \FileHosting\Helpers\Helper;
 class CommentModel{
 	protected $id;
-	public $file_id;
-	public $parent_id;
+	public $fileId;
+	public $parentId;
 	public $text;
 	public $nick;
 	public $time;
@@ -20,11 +20,11 @@ class CommentModel{
 		return $this->id;
 	}
 
-	public function addInfo($info_array){
-		foreach($info_array as $key=>$value){			
-			$object_vars=get_object_vars($this);
+	public function addInfo($infoArray){
+		foreach($infoArray as $key=>$value){			
+			$objectVars=get_object_vars($this);
 			//Если есть переменная в объекте
-			if(array_key_exists($key,$object_vars)){
+			if(array_key_exists($key,$objectVars)){
 				//Если значение из массива не пустое
 				if(isset($value) and ($value!=NULL)){
 					//Передать значение объекту
@@ -33,8 +33,8 @@ class CommentModel{
 			}
 		}
 
-		if(isset($info_array['id'])){
-			$this->setId($info_array['id']);
+		if(isset($infoArray['id'])){
+			$this->setId($infoArray['id']);
 		}
 	}
 }

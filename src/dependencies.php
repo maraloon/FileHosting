@@ -6,13 +6,13 @@ $container = $app->getContainer();
 // view renderer
 $container['renderer'] = function ($c) {
     $settings = $c->get('settings')['renderer'];
-    return new Slim\Views\PhpRenderer($settings['template_path']);
+    return new Slim\Views\PhpRenderer($settings['templatePath']);
 };
 
 // view renderer twig
 $container['view'] = function ($c) {
 	$settings = $c->get('settings')['renderer'];
-    $view = new \Slim\Views\Twig($settings['template_path']);
+    $view = new \Slim\Views\Twig($settings['templatePath']);
     $view->addExtension(new \Slim\Views\TwigExtension(
         $c['router'],
         $c['request']->getUri()
@@ -38,20 +38,27 @@ $container['db'] = function ($c) {
 };
 
 
-$container['files_GW'] = function ($c) {
+$container['filesGW'] = function ($c) {
     return new \FileHosting\DataBase\FilesTDGW($c['db']);
 };
 
-$container['files_FM'] = function ($c) {
+$container['filesFM'] = function ($c) {
     return new \FileHosting\FilesFileManager($c['db']);
 };
 
-$container['comments_GW'] = function ($c) {
+$container['commentsGW'] = function ($c) {
     return new \FileHosting\DataBase\CommentsTDGW($c['db']);
 };
 
-$container['commentsTree'] = function ($c) {
-    return new \FileHosting\Models\CommentsTreeModel();
+$container['commentsSorter'] = function ($c) {
+    return new \FileHosting\Models\CommentsSorter();
+};
+
+/**
+ * 
+ */
+$container['ID3Choser'] = function ($c) {
+    return new \FileHosting\Helpers\ID3Choser();
 };
 
 // monolog

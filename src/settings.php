@@ -1,6 +1,6 @@
 <?php
 
-$project_folder='filehosting';
+$projectFolder='filehosting';
 
 return [
     'settings' => [
@@ -9,7 +9,7 @@ return [
 
         // Renderer settings
         'renderer' => [
-            'template_path' => __DIR__ . '/../templates/',
+            'templatePath' => __DIR__ . '/../templates/',
         ],
 
         // Monolog settings
@@ -19,8 +19,9 @@ return [
         ],
 
         //Path of uploaded files
-        'project_folder'    => "/$project_folder",
-        'upload_folder'=>"/$project_folder/public/files/",
+        'projectFolder'    => "/$projectFolder",
+        'uploadUri'=>"/$projectFolder/public/files/",
+        'uploadFolder'=>__DIR__ ."/../public/files/",
         //PDO Connection
         'db'=> [
             'host'=>'localhost',

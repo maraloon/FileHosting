@@ -3,19 +3,19 @@ namespace FileHosting;
 class FilesFileManager{
 	/**
 	 * @var \FileHosting\Models\FileModel $file
-	 * @var string $upload_folder
+	 * @var string $uploadUri
 	 * @return bool status of copy
 	 */
-	public function addFile(\FileHosting\Models\FileModel $file, string $upload_folder){
+	public function addFile(\FileHosting\Models\FileModel $file, string $uploadUri){
 		// Каталог, в который мы будем принимать файл:
-		$uploaddir=$_SERVER['DOCUMENT_ROOT'].$upload_folder.$file->path;
-		$file_to_upload = $uploaddir.basename($file->name);
+		$uploaddir=$_SERVER['DOCUMENT_ROOT'].$uploadUri.$file->path;
+		$fileToUpload = $uploaddir.basename($file->name);
 		//Если папки нет -> создаём
 		if (!file_exists($uploaddir)) {
 			mkdir($uploaddir,0777,true);
 		}
 		//Копируем файл из каталога для временного хранения файлов:
-		if (copy($_FILES['file_to_upload']['tmp_name'], $file_to_upload)){
+		if (copy($_FILES['fileToUpload']['tmp_name'], $fileToUpload)){
 			return true;	
 		}
 		else{

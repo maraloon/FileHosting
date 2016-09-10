@@ -4,10 +4,13 @@ use \FileHosting\Helpers\Helper;
 
 $app->get('/[upload]', function ($request, $response, $args) {
     $this->logger->info("Главная страница");
-    $args['project_folder']=$this->settings['project_folder'];
+    $args['projectFolder']=$this->settings['projectFolder'];
 
     return $this->view->render($response, 'upload.html', $args);
 })->setName('main');
+
+
+
 
 
 $app->post('/upload', function ($request, $response, $args) {
@@ -16,15 +19,15 @@ $app->post('/upload', function ($request, $response, $args) {
 //Создаём объект FileModel
     $file=new Models\FileModel();
 
-    $file->setName($_FILES['file_to_upload']['name']);
-    $file->size=$_FILES['file_to_upload']['size'];
+    $file->setName($_FILES['fileToUpload']['name']);
+    $file->size=$_FILES['fileToUpload']['size'];
     $file->description=$_POST['description'];
  
 //Копируем файл на сервер
-    $args['status']=$this->files_FM->addFile($file,$this->settings['upload_folder']);  
+    $args['status']=$this->filesFM->addFile($file,$this->settings['uploadUri']);  
 //Записываем в БД
     if ($args['status']) {
-        $this->files_GW->addFile($file);
+        $this->filesGW->addFile($file);
     }
 
 	//Представление
@@ -32,32 +35,41 @@ $app->post('/upload', function ($request, $response, $args) {
 });
 
 
+
+
 $app->get('/files_list', function ($request, $response, $args){
     $this->logger->info("Страница последних загрузок");
 
-    $args['upload_folder']=$this->settings['upload_folder'];
-    $args['files']=$this->files_GW->getLastFiles(100);
+    $args['uploadUri']=$this->settings['uploadUri'];
+    $args['files']=$this->filesGW->getLastFiles(100);
 
     return $this->view->render($response, 'files_list.html', $args);
 })->setName('files_list');
 
 
 
+
+
 $app->get('/show_file/{id}', function ($request, $response, $args){
     $this->logger->info("Просмотр файла");
-    $args['project_folder']=$this->settings['project_folder'];
+    $args['projectFolder']=$this->settings['projectFolder'];
 
-    $file=$this->files_GW->getFile($args['id']);
+    $file=$this->filesGW->getFile($args['id']);
     if ($file!=NULL) {
-        $args['file']=$file;
-        $args['file_path']=$this->settings['upload_folder'].$file->path.$file->name;
+        $comments=$this->commentsGW->getComments($args['id']);
+        $comments=$this->commentsSorter->sortComments($comments);
 
-        $comments=$this->comments_GW->getComments($args['id']);
+        $fileUri=Helper::getPathForFile($this->settings['uploadUri'],$file);
 
-        $comments_tree=$this->commentsTree->makeTree($comments);
-        $comments=$this->commentsTree->sortComments($comments,array(),$comments_tree,0);
-        $args['comments']=$comments;
+        if (in_array($file->getType(), array('audio','video'))) {
+            $filePath=Helper::getPathForFile($this->settings['uploadFolder'],$file);
+            $args['id3']=$this->ID3Choser->getTags($filePath,$file->getType());
+        }
         
+        $args['fileUri']= $fileUri;
+        $args['comments']=$comments;
+        $args['file']=$file;
+
     }
 
     return $this->view->render($response, 'show_file.html', $args);
@@ -67,19 +79,39 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
 
 
 
+
+
 $app->get('/download/{id}', function ($request, $response, $args) {
     $this->logger->info("Загрузка файла");
 
-    $file=$this->files_GW->getFile($args['id']);
+    $fileObject=$this->filesGW->getFile($args['id']);
+ 
+    /*
+    //Средствами PHP
+    $path=Helper::getPathForFile($this->settings['uploadFolder'],$fileObject);
+    $file=readfile($path);
+    $response = $response->withHeader('Content-Description', 'File Transfer');
+    $response = $response->withHeader('Content-Type', mime_content_type($path));
+    $response = $response->withHeader('Content-Disposition', 'attachment; filename='.$fileObject->originalName);
+    $response = $response->withHeader('Content-Transfer-Encoding', 'binary');
+    $response = $response->withHeader('Expires','0');
+    $response = $response->withHeader('Cache-Control', 'must-revalidate');
+    $response = $response->withHeader('Pragma', 'public');
+    $response = $response->withHeader('Content-Length', filesize($path));
 
-    $url=$this->settings['upload_folder'];
-    $url.=$file->path;
-    $url.=$file->name;
+    $body = $response->getBody();
+    $body->write($file);
+    return $response;*/
 
-    $response = $response->withHeader('Content-Disposition', 'attachment');
-    $response = $response->withHeader('Location', $url);
-    return $this->view->render($response, 'download.html', $args);
+    //Средствами Apache
+    $uri=urlencode(Helper::getPathForFile($this->settings['uploadUri'],$fileObject));
+    $uri=str_replace ( '%2F','/', $uri );
+    $response = $response->withRedirect($uri);
+    return $response;
 })->setName('download');
+
+
+
 
 
 $app->post('/add_comment', function ($request, $response, $args){
@@ -90,13 +122,14 @@ $app->post('/add_comment', function ($request, $response, $args){
 
     $comment->text=$_POST['comment'];
     $comment->nick=$_POST['nick'];
-    $comment->file_id=$_POST['file_id'];
+    $comment->fileId=$_POST['fileId'];
+    $comment->parentId=$_POST['parentId'];
  
 //Записываем в БД
-    $this->comments_GW->addComment($comment);
+    $this->commentsGW->addComment($comment);
 
     //Представление
-    $url=$this->router->pathFor('show_file',['id'=>$_POST['file_id']]);
+    $url=$this->router->pathFor('show_file',['id'=>$_POST['fileId']]);
     $response = $response->withHeader('Location', $url);
     return $this->view->render($response, 'show_file.html', $args);
 })->setName('add_comment');

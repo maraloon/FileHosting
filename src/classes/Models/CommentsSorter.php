@@ -1,27 +1,33 @@
 <?php
 namespace FileHosting\Models;
-class CommentsTreeModel{
+class CommentsSorter{
 
 	public $tree;
 
 	function __construct(){
 	}
 
-	public function makeTree($comments){
+	public function sortComments($comments){
+		$tree=$this->makeTree($comments);
+		$comments=$this->getSortedComments($comments,array(),$tree,0);
+		return $comments;
+	}
+
+	protected function makeTree($comments){
 		$tree=array();
 
 		foreach ($comments as $comment) { //разбираем каждую строку из таблицы
 			$id=$comment->getId(); //id текущего комента
-			$parent_id=$comment->parent_id; //id родительского комента (тот, на котроый отвечают)
+			$parentId=$comment->parentId; //id родительского комента (тот, на котроый отвечают)
 
-			if (empty($parent_id)) { //если родителя нет, значит это комент без вложеннности, коммент к файлу
+			if (empty($parentId)) { //если родителя нет, значит это комент без вложеннности, коммент к файлу
 				$tree[$id]=array();
 			}
 			else{
-				$find_key=$this->findKey($tree,(int)$parent_id,array()); //ищет путь родителя
+				$findKey=$this->findKey($tree,(int)$parentId,array()); //ищет путь родителя
 				$parent=&$tree; //подготавливаем родителя
-				foreach ($find_key as $next_comment) { //для каждого элемента вложенности
-					$parent=&$parent[$next_comment];
+				foreach ($findKey as $nextComment) { //для каждого элемента вложенности
+					$parent=&$parent[$nextComment];
 				}
 				$parent[$id]=array(); //создаём у родителя текущий комент
 			}
@@ -31,20 +37,20 @@ class CommentsTreeModel{
 		return $tree;
 	}
 
-	protected function findKey($tree,$target_key,$way){
-		if (array_key_exists($target_key,$tree)){
-			$way[]=$target_key;
+	protected function findKey($tree,$targetKey,$way){
+		if (array_key_exists($targetKey,$tree)){
+			$way[]=$targetKey;
 			return $way;
 		}
 		else{
-			foreach ($tree as $current_key => $child_tree) {
-				if (!empty($child_tree)) {
+			foreach ($tree as $currentKey => $childTree) {
+				if (!empty($childTree)) {
 					
-					$way[]=$current_key;
-					$result=$this->findKey($child_tree,$target_key,$way);
+					$way[]=$currentKey;
+					$result=$this->findKey($childTree,$targetKey,$way);
 					
 					if ($result!=NULL) {
-						if (in_array($target_key, $result)) {
+						if (in_array($targetKey, $result)) {
 							return $result;
 						}
 					}
@@ -67,17 +73,17 @@ class CommentsTreeModel{
 	 * 
 	 * @return array Массив отсортированных комментов вида (deep='глубина', comment=Object CommentModel)
 	 */
-	public function sortComments(array $comments,array $sortedComments,array $tree,int $currentDeep){
+	protected function getSortedComments(array $comments,array $sortedComments,array $tree,int $currentDeep){
 
 		if (empty($tree)) { // если нет подкомментов
 			return $sortedComments; //вернуть рекурсивно
 		}
 		else{ // если есть подкоммент(ы)
-			foreach ($tree as $id => $child_tree) { //для каждого подкоммента
+			foreach ($tree as $id => $childTree) { //для каждого подкоммента
 				$last=array('deep'=>$currentDeep,'comment'=>$this->searchComment($id,$comments));
 				$sortedComments[]=$last; //добавить подкоммент в список отсортированных
 
-				$sortedComments=$this->sortComments($comments,$sortedComments,$child_tree,$currentDeep+1); //проверить подкоммент на наличие подкомментов
+				$sortedComments=$this->getSortedComments($comments,$sortedComments,$childTree,$currentDeep+1); //проверить подкоммент на наличие подкомментов
 			}
 
 		}
@@ -87,7 +93,7 @@ class CommentsTreeModel{
 	/**
 	 * Находит коммент с нужным id
 	 */
-	private function searchComment(int $id, array $comments){
+	protected function searchComment(int $id, array $comments){
 		foreach ($comments as $comment) {
 			if ($comment->getId()==$id) {
 				return $comment;

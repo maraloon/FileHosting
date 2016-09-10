@@ -3,7 +3,8 @@
 {% block title %}Show File{% endblock %}
 
 {% block scripts %}
-	<script src="{{ project_folder }}/public/js/uppod.js" type="text/javascript"></script>
+	<script src="{{ projectFolder }}/public/js/uppod.js" type="text/javascript"></script>
+	<script src="{{ projectFolder }}/public/js/helper.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block h1 %}Просмотр файла{% endblock %}
@@ -17,51 +18,71 @@
 		<div class="file_card">
 			{% if file.getType() == 'image' %}
 				<div class="preview">
-					<img height="100" src="{{ file_path }}">
+					<img height="100" src="{{ fileUri }}">
 				</div>
 			{% elseif file.getType() == 'audio' or file.getType() == 'video' %}
 				<div class="player" id="uppod_player"></div>
-				<script type="text/javascript">this.player = new Uppod({m:"{{ file.getType() }}",uid:"uppod_player",file:"{{ file_path }}"});</script>
+				<script type="text/javascript">this.player = new Uppod({m:"{{ file.getType() }}",uid:"uppod_player",file:"{{ fileUri }}"});</script>
 			{% endif %}
 
-			<div class="name">{{ file.original_name }}</div>
+			<div class="name">{{ file.originalName }}</div>
 			<div class="time">{{ file.time }}</div>
 			<div class="size">{{ file.showSize() }}</div>
-			<div class="time">{{ file.description }}</div>
+			<div class="description">{{ file.description }}</div>
+
+			{% if id3 is defined %}
+				<br>
+				<div class="id3">
+					<h3>ID3 Теги</h3>
+					{% for key,value in id3 %}
+						{{ key }}:{{ value }}<br>
+					{% endfor %}
+				</div>
+				<br>
+			{% endif %}
+			
 			<div class="download">
 				<a href="{{ path_for('download', { 'id': file.getId() }) }}">Скачать</a>
 			</div>
 
-			<div class="comments">
+			<div id="comments">
 				<h2>Комментарии</h2>
 					{% for comment in comments %}
-						<p>
-							{% if comment.deep != 0 %}
-								{% for i in 0..comment.deep %}
-									<font color='white'>###</font>
-								{% endfor %}
-							{% endif %}
+						<div id="comment_{{ comment.comment.getId() }}">
+							<p>
+								{% if comment.deep != 0 %}
+									{% for i in 0..comment.deep %}
+										<font color='white'>###</font>
+									{% endfor %}
+								{% endif %}
 
-							{{ comment.comment.time }}
-							
-							{% if comment.comment.nick == NULL %}
-								Anon
-							{% else %}
-								{{ comment.comment.nick }}
-							{% endif %}
+								{{ comment.comment.time }}
+								
+								{% if comment.comment.nick == NULL %}
+									Anon
+								{% else %}
+									{{ comment.comment.nick }}
+								{% endif %}
 
-							{{ comment.comment.text }}
-						</p>
+								{{ comment.comment.text }}
+
+								<button onclick="showCommentForm(
+									{{ file.getId() }},
+									{{ comment.comment.getId() }},
+									'{{ path_for('add_comment') }}'
+									);">[>]</button>
+							</p>
+						</div>
 					{% endfor %}
-
-				<h3>Добавить комментарий</h3>
+			</div>
+				<h3>Добавить комментарий к файлу</h3>
 				<form method='post' action="{{ path_for('add_comment') }}">
 					<input type="text" name="comment">
 					<input type="text" name="nick" placeholder="Anon">
-					<input type="hidden" name="file_id" value="{{ file.getId() }}">
+					<input type="hidden" name="fileId" value="{{ file.getId() }}">
 					<button type="submit">Комментировать</button>
 				</form>
-			</div>
+			
 		</div>
 	{% endif %}
 {% endblock %}

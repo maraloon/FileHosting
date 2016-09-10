@@ -14,13 +14,13 @@ class FilesTDGW{
 	 */
 	public function addFile(FileModel $file){
 		$SqlString="INSERT INTO `files`
-				(`name`,`original_name`,`path`,`size`,`description`)
+				(`name`,`originalName`,`path`,`size`,`description`)
 				VALUES
-				(:name,:original_name,:path,:size,:description)";
+				(:name,:originalName,:path,:size,:description)";
 
 		$rows = $this->db->prepare($SqlString);
 		$rows->bindValue(':name', $file->name, \PDO::PARAM_STR);
-		$rows->bindValue(':original_name', $file->original_name, \PDO::PARAM_STR);
+		$rows->bindValue(':originalName', $file->originalName, \PDO::PARAM_STR);
 		$rows->bindValue(':path', $file->path, \PDO::PARAM_STR);
 		$rows->bindValue(':size', $file->size, \PDO::PARAM_INT);
 		$rows->bindValue(':description', $file->description, \PDO::PARAM_STR);

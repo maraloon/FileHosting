@@ -32,10 +32,14 @@ class Helper{
 		return strtr($input, $gost);
 	}
 
-	static function execDisable($file_name){
-		if (preg_match("/^((\w)|(\d)|[ -_])*(.)(php|phtml|html|js)$/iu", $file_name)){
-			$file_name.='.txt';
+	static function execDisable($fileName){
+		if (preg_match("/^((\w)|(\d)|[ -_])*(.)(php|phtml|html|js)$/iu", $fileName)){
+			$fileName.='.txt';
 		}
-		return $file_name;
+		return $fileName;
+	}
+
+	static function getPathForFile($uploadFolder,$file){
+	    return $uploadFolder.$file->path.$file->name;
 	}
 }
