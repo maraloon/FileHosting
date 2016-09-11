@@ -5,7 +5,8 @@
         "slim/php-view": "^2.0",
         "monolog/monolog": "^1.17",
         "slim/twig-view": "^2.1",
-        "james-heinrich/getid3": "^1.9"
+        "james-heinrich/getid3": "^1.9",
+        "components/jquery": "^3.1"
     },
 
     "autoload": {
