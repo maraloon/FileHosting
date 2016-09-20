@@ -10,7 +10,7 @@ class FilesTDGW{
 
 	/**
 	 * @var \FileHosting\Models\FileModel $file
-	 * @return bool status of adding to DB
+	 * @return integer id
 	 */
 	public function addFile(FileModel $file){
 		$SqlString="INSERT INTO `files`
@@ -24,6 +24,29 @@ class FilesTDGW{
 		$rows->bindValue(':path', $file->path, \PDO::PARAM_STR);
 		$rows->bindValue(':size', $file->size, \PDO::PARAM_INT);
 		$rows->bindValue(':description', $file->description, \PDO::PARAM_STR);
+		$rows->execute();
+
+		return $this->db->lastInsertId();
+	}
+
+	public function addDescription(int $id, $description){
+		$SqlString="UPDATE `files`
+				SET `description`=:description
+				WHERE `id`=:id";
+
+		$rows = $this->db->prepare($SqlString);
+		$rows->bindValue(':id', $id, \PDO::PARAM_INT);
+		$rows->bindValue(':description', $description, \PDO::PARAM_STR);
+		$rows->execute();
+	}
+
+	public function incrementNumberOfDownloads(int $id){
+		$SqlString="UPDATE `files`
+				SET `numberOfDownloads`=`numberOfDownloads`+1
+				WHERE `id`=:id";
+
+		$rows = $this->db->prepare($SqlString);
+		$rows->bindValue(':id', $id, \PDO::PARAM_INT);
 		$rows->execute();
 	}
 

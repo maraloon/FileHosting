@@ -8,6 +8,7 @@ class FileModel{
 	public $path;
 	public $size;
 	public $time;
+	public $numberOfDownloads;
 	public $description;
 
 	function __construct(){

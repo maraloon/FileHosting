@@ -2,6 +2,9 @@
 use \FileHosting\Models;
 use \FileHosting\Helpers\Helper;
 
+
+
+
 $app->get('/[upload]', function ($request, $response, $args) {
     $this->logger->info("Главная страница");
     $args['projectFolder']=$this->settings['projectFolder'];
@@ -12,26 +15,48 @@ $app->get('/[upload]', function ($request, $response, $args) {
 
 
 
-
 $app->post('/upload', function ($request, $response, $args) {
-    $this->logger->info("Кнопка: отправить файл");
+    $this->logger->info("Button: отправить файл");
 
-//Создаём объект FileModel
+    //Создаём объект FileModel
     $fileModel=new Models\FileModel();
-
-    $fileModel->setName($_FILES['fileToUpload']['name']);
-    $fileModel->size=$_FILES['fileToUpload']['size'];
-    $fileModel->description=$_POST['description'];
+    $fileModel->setName($_FILES['file']['name']);
+    $fileModel->size=$_FILES['file']['size'];
  
-//Копируем файл на сервер
-    $args['status']=$this->filesFM->addFile($file,$this->settings['uploadUri']);  
-//Записываем в БД
-    if ($args['status']) {
-        $this->filesGW->addFile($fileModel);
-    }
+    //Копируем файл на сервер
+    $args['status']=$this->filesFM->addFile($fileModel,$this->settings['uploadUri']);
 
+    if ($args['status']) {
+        //Записываем в БД
+        $fileId=$this->filesGW->addFile($fileModel);
+        //Передаём пользователю id добавленного файла, чтобы он редактировал его в add_info
+        $_SESSION['fileId']=$fileId;
+    }
 	//Представление
-    return $this->view->render($response, 'upload.html', $args);
+    return $this->view->render($response, 'upload_status.html', $args);
+});
+
+
+
+
+$app->get('/add_info', function ($request, $response, $args) {
+    $this->logger->info("Добавление информации после загрузки");
+
+    $args['fileId']=$_SESSION['fileId'];
+    return $this->view->render($response, 'add_info.html', $args); 
+})->setName('add_info');
+
+
+
+
+$app->post('/add_info', function ($request, $response, $args) {
+    $this->logger->info("Button: добавить информацию");
+    //Добавляем описание в таблицу
+    $this->filesGW->addDescription($_SESSION['fileId'],$_POST['description']);
+    //Перенаправляем на страницу файла
+    $url=$this->router->pathFor('show_file',['id'=>$_SESSION['fileId']]);
+    $response = $response->withRedirect($url);
+    return $response;
 });
 
 
@@ -45,7 +70,6 @@ $app->get('/files_list', function ($request, $response, $args){
 
     return $this->view->render($response, 'files_list.html', $args);
 })->setName('files_list');
-
 
 
 
@@ -67,7 +91,7 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
         $args['fileUri']= $fileUri;
         $args['comments']=$comments;
         $args['file']=$fileModel;
-
+        $args['fileNameForUrl']=rawurlencode($fileModel->originalName);
     }
 
     return $this->view->render($response, 'show_file.html', $args);
@@ -76,14 +100,13 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
 
 
 
-
-
-
-$app->get('/download/{id}', function ($request, $response, $args) {
+$app->get('/download/{id}/{name}', function ($request, $response, $args) {
     $this->logger->info("Загрузка файла");
 
     $fileModel=$this->filesGW->getFile($args['id']);
- 
+
+    //Счётчик загрузок +1
+    $fileModel=$this->filesGW->incrementNumberOfDownloads($args['id']);
     /*
     //Средствами PHP
     $path=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
@@ -99,15 +122,31 @@ $app->get('/download/{id}', function ($request, $response, $args) {
 
     $body = $response->getBody();
     $body->write($file);
-    return $response;*/
+    */
 
+
+    //XSendFile
+    $path=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
+    var_dump(realpath($path));
+    var_dump(basename($path));
+    if (file_exists($path)) {
+        $response = $response->withHeader('X-SendFile', realpath($path));
+        //$response = $response->withHeader('Content-Type','application/octet-stream');
+        //$response = $response->withHeader('Content-Type', mime_content_type($path));
+        $response = $response->withHeader('Content-Disposition','attachment; filename=' . $args['name']);
+
+
+    }
+    var_dump($response);
+    /*
     //Средствами Apache
     $uri=urlencode(Helper::getPathForFile($this->settings['uploadUri'],$fileModel));
     $uri=str_replace ( '%2F','/', $uri );
-    $response = $response->withRedirect($uri);
+    $response = $response->withRedirect($uri);*/
+    
+
     return $response;
 })->setName('download');
-
 
 
 

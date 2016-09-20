@@ -15,7 +15,7 @@ class FilesFileManager{
 			mkdir($uploaddir,0777,true);
 		}
 		//Копируем файл из каталога для временного хранения файлов:
-		if (copy($_FILES['fileToUpload']['tmp_name'], $fileToUpload)){
+		if (copy($_FILES['file']['tmp_name'], $fileToUpload)){
 			return true;	
 		}
 		else{

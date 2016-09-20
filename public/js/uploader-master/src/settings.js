@@ -35,8 +35,9 @@
       // Upload Plugin itself
       $('#drag-and-drop-zone').dmUploader({
         url: 'upload',
-        dataType: 'json',
-        allowedTypes: 'image/*',
+        dataType: 'html',
+        allowedTypes: '*',
+        maxFiles:0,
         onInit: function(){
           add_log('Penguin initialized :)');
         },
@@ -52,6 +53,7 @@
         },
         onComplete: function(){
           add_log('All pending tranfers finished');
+          window.location.replace('add_info');
         },
         onUploadProgress: function(id, percent){
           var percentStr = percent + '%';

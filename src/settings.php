@@ -1,6 +1,6 @@
 <?php
 
-$projectFolder='filehosting';
+$projectFolder='filehosting2';
 
 return [
     'settings' => [

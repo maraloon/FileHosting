@@ -1,67 +1,51 @@
 {% extends "base.html" %}
 
 {% block title %}Upload{% endblock %}
-{% block scripts %}
-    <link rel="stylesheet" href="http://danielm.herokuapp.com/demos/dnd/css/simple-demo.css" rel="stylesheet" />
+{% block ScriptsBeforeBody %}
+    <link rel="stylesheet" href="{{ projectFolder }}/public/css/uploader-master.css" rel="stylesheet" />
 {% endblock %}
 {% block h1 %}Страница загрузки (главная){% endblock %}
 
 {% block content %}
     {{ parent() }}
-        {% if status is defined %}
-            {% if status %}
-                <p>Файл успешно загружен</p>
-            {% else %}
-                <p>Ошибка: файл не загружен</p>
-            {% endif %}  
-            <a href="upload">Загрузить еще</a>
-
-        {% else %}
-            <div class="wrapper">
-                  <h1>Simple Demo</h1>
-                  
-                  <div class="left-column">
-                    <!-- D&D Markup -->
-                    <div id="drag-and-drop-zone" class="uploader">
-                      <div>Drag &amp; Drop Images Here</div>
-                      <div class="or">-or-</div>
-                      <div class="browser">
-                        <label>
-                          <span>Click to open the file Browser</span>
-                          <input type="file" name="fileToUpload" title='Click to add Files'>
-                        </label>
-                      </div>
-                    </div>
-                    <!-- /D&D Markup -->
-                  </div>
-                  
-                  <div id="fileList">
+        <div class="wrapper">
+              <h1>Simple Demo</h1>
+              
+              <div class="left-column">
+                <!-- D&D Markup -->
+                <div id="drag-and-drop-zone" class="uploader">
+                  <div>Drag &amp; Drop Images Here</div>
+                  <div class="or">-or-</div>
+                  <div class="browser">
+                    <label>
+                      <span>Click to open the file Browser</span>
+                      <input type="file" name="files[]" title='Click to add Files'>
+                    </label>
                     
-                    <!-- Files will be places here -->
-
                   </div>
-                  
-                  <div id="debug">
-                    <h2>Debug</h2>
-                    <div>
-                      <ul>
-                        <!-- Debug lines will be added here -->
-                      </ul>
-                    </div>
-                  </div>
-            </div>
+                </div>
+                <!-- /D&D Markup -->
+              </div>
+              
+              <div id="fileList">
+                
+                <!-- Files will be places here -->
 
-            <form role="form" class="form-horizontal" method='post' action='upload' enctype=multipart/form-data>
-                <input type="file" name="fileToUpload">
-                <input type="text" name="description" placeholder="Описание файла">
-                <button class="btn btn-primary btn-lg" type="submit">Загрузить</button>
-            </form>
-        {% endif %}
+              </div>
+              
+              <div id="debug">
+                <h2>Debug</h2>
+                <div>
+                  <ul>
+                    <!-- Debug lines will be added here -->
+                  </ul>
+                </div>
+              </div>
+        </div>
 {% endblock %}
 
 {% block ScriptsAfterBody %}
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="{{ projectFolder }}/vendor/components/jquery/jquery.js"></script>
     <script src="{{ projectFolder }}/public/js/uploader-master/src/dmuploader.min.js"></script>
     <script src="{{ projectFolder }}/public/js/uploader-master/src/settings.js"></script>
 {% endblock %}
