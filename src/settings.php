@@ -22,6 +22,7 @@ return [
         'projectFolder'    => "/$projectFolder",
         'uploadUri'=>"/$projectFolder/public/files/",
         'uploadFolder'=>__DIR__ ."/../public/files/",
+
         //PDO Connection
         'db'=> [
             'host'=>'localhost',

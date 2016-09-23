@@ -2,23 +2,24 @@
 
 {% block title %}Upload{% endblock %}
 {% block ScriptsBeforeBody %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ projectFolder }}/public/css/uploader-master.css" rel="stylesheet" />
 {% endblock %}
-{% block h1 %}Страница загрузки (главная){% endblock %}
+{% block h1 %}Загрузка файлов{% endblock %}
 
 {% block content %}
     {{ parent() }}
         <div class="wrapper">
-              <h1>Simple Demo</h1>
+              <h1>Drug'n'drop</h1>
               
               <div class="left-column">
                 <!-- D&D Markup -->
                 <div id="drag-and-drop-zone" class="uploader">
-                  <div>Drag &amp; Drop Images Here</div>
+                  <div>Кидать файл сюда</div>
                   <div class="or">-or-</div>
                   <div class="browser">
                     <label>
-                      <span>Click to open the file Browser</span>
+                      <span>Выбрать файл вручную</span>
                       <input type="file" name="files[]" title='Click to add Files'>
                     </label>
                     
@@ -34,7 +35,7 @@
               </div>
               
               <div id="debug">
-                <h2>Debug</h2>
+                <h2>Статус загрузки</h2>
                 <div>
                   <ul>
                     <!-- Debug lines will be added here -->

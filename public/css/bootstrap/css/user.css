@@ -1,0 +1,31 @@
+footer {
+  padding: 40px;
+}
+
+.comment {
+    background: #c5d0e6;
+    border: 1px solid #2a6478; /* Белая рамка */
+    border-radius: 5px; /* Радиус скругления */
+}
+
+.deep_1 {
+    padding-left: 30px;
+}
+.deep_2 {
+    padding-left: 60px;
+}
+.deep_3 {
+    padding-left: 90px;
+}
+.deep_4 {
+    padding-left: 120px;
+}
+.deep_5 {
+    padding-left: 150px;
+}
+.deep_6 {
+    padding-left: 180px;
+}
+.deep_7 {
+    padding-left: 210px;
+}

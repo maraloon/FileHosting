@@ -3,28 +3,37 @@
     <head>
         <meta charset="utf-8"/>
         <title>{% block title %}{% endblock %} - FileHosting</title>
-        {% block ScriptsBeforeBody %}{% endblock %}
+        {% block ScriptsBeforeBody %}
+            <link href="{{ projectFolder }}/public/css/bootstrap/css/bootstrap.css" rel="stylesheet">
+            <link href="{{ projectFolder }}/public/css/bootstrap/css/user.css" rel="stylesheet">
+        {% endblock %}
         
     </head>
     <body>
-    	<div id="content">
-    	{% block content %}
-    		<h1>{% block h1 %}{% endblock %}</h1>
-    	{% endblock %}
-    	</div>
+    	<div class='container'>
+            <div class='row'>
+            	{% block content %}
+            		<h1>{% block h1 %}{% endblock %}</h1>
+            	{% endblock %}
 
-    	<div id="footer">
-            {% block footer %}
-            	<br>
-            	<a href="{{ path_for('files_list') }}">Последние загруженные файлы</a>
-				<a href="{{ path_for('main') }}">Загрузить</a>
-				<br>
-
-                <a href='https://gist.github.com/codedokode/9424217'>Техническое задание</a>
-                <a href='https://github.com/TheSidSpears/FileHosting'>Git</a> проекта
-            {% endblock %}
+            	<footer class="navbar-bottom row-fluid text-center">
+                    {% block footer %}
+                    <div class="col-md-3">
+        				<a href="{{ path_for('main') }}">Загрузить</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ path_for('files_list') }}">Последние загруженные файлы</a>
+                    </div>
+                    <div class="col-md-3">
+                         <a href='https://gist.github.com/codedokode/9424217'>Техническое задание</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href='https://github.com/TheSidSpears/FileHosting'>Git</a> проекта
+                    </div>
+                    {% endblock %}
+                </footer>
+            </div>
         </div>
-
 
         {% block ScriptsAfterBody %}{% endblock %}
     </body>

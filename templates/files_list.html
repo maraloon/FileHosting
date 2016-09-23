@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}Files List{% endblock %}
+{% block ScriptsBeforeBody %}
+    {{ parent() }}
+{% endblock %}
 {% block h1 %}Последние загрузки{% endblock %}
 
 {% block content %}

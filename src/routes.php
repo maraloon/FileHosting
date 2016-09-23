@@ -2,13 +2,15 @@
 use \FileHosting\Models;
 use \FileHosting\Helpers\Helper;
 
-
-
+//Определяем переменные, которые используются в >1 роутере
+function init_vars($container){
+    $vars['projectFolder']=$container->settings['projectFolder'];
+    return $vars;
+};
 
 $app->get('/[upload]', function ($request, $response, $args) {
     $this->logger->info("Главная страница");
-    $args['projectFolder']=$this->settings['projectFolder'];
-
+    $args=array_merge($args,init_vars($this));
     return $this->view->render($response, 'upload.html', $args);
 })->setName('main');
 
@@ -41,6 +43,7 @@ $app->post('/upload', function ($request, $response, $args) {
 
 $app->get('/add_info', function ($request, $response, $args) {
     $this->logger->info("Добавление информации после загрузки");
+    $args=array_merge($args,init_vars($this));
 
     $args['fileId']=$_SESSION['fileId'];
     return $this->view->render($response, 'add_info.html', $args); 
@@ -64,6 +67,7 @@ $app->post('/add_info', function ($request, $response, $args) {
 
 $app->get('/files_list', function ($request, $response, $args){
     $this->logger->info("Страница последних загрузок");
+    $args=array_merge($args,init_vars($this));
 
     $args['uploadUri']=$this->settings['uploadUri'];
     $args['files']=$this->filesGW->getLastFiles(100);
@@ -76,7 +80,7 @@ $app->get('/files_list', function ($request, $response, $args){
 
 $app->get('/show_file/{id}', function ($request, $response, $args){
     $this->logger->info("Просмотр файла");
-    $args['projectFolder']=$this->settings['projectFolder'];
+    $args=array_merge($args,init_vars($this));
 
     $fileModel=$this->filesGW->getFile($args['id']);
     if ($fileModel!=NULL) {
@@ -93,7 +97,6 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
         $args['file']=$fileModel;
         $args['fileNameForUrl']=rawurlencode($fileModel->originalName);
     }
-
     return $this->view->render($response, 'show_file.html', $args);
 })->setName('show_file');
 
@@ -102,7 +105,8 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
 
 $app->get('/download/{id}/{name}', function ($request, $response, $args) {
     $this->logger->info("Загрузка файла");
-
+    //$args=array_merge($args,init_vars($this));
+    
     $fileModel=$this->filesGW->getFile($args['id']);
 
     //Счётчик загрузок +1
