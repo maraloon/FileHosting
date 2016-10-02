@@ -53,7 +53,7 @@
         },
         onComplete: function(){
           add_log('All pending tranfers finished');
-          window.location.replace('add_info');
+
         },
         onUploadProgress: function(id, percent){
           var percentStr = percent + '%';
@@ -68,6 +68,7 @@
           update_file_status(id, 'success', 'Upload Complete');
           
           update_file_progress(id, '100%');
+
         },
         onUploadError: function(id, message){
           add_log('Failed to Upload file #' + id + ': ' + message);

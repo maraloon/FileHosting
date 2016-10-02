@@ -8,7 +8,7 @@ function init_vars($container){
     return $vars;
 };
 
-$app->get('/[upload]', function ($request, $response, $args) {
+$app->get('/', function ($request, $response, $args) {
     $this->logger->info("Главная страница");
     $args=array_merge($args,init_vars($this));
     return $this->view->render($response, 'upload.html', $args);
@@ -20,21 +20,25 @@ $app->get('/[upload]', function ($request, $response, $args) {
 $app->post('/upload', function ($request, $response, $args) {
     $this->logger->info("Button: отправить файл");
 
-    //Создаём объект FileModel
-    $fileModel=new Models\FileModel();
-    $fileModel->setName($_FILES['file']['name']);
-    $fileModel->size=$_FILES['file']['size'];
- 
     //Копируем файл на сервер
-    $args['status']=$this->filesFM->addFile($fileModel,$this->settings['uploadUri']);
+    $args['status']=$this->filesFM->addFile($_FILES['file']['name'],$this->settings['uploadUri']);
 
     if ($args['status']) {
+        //Создаём модель
+        $fileModel=new Models\FileModel();
+        $fileModel->size=$_FILES['file']['size'];
+        $fileModel->originalName=$this->filesFM->getOriginalName();
+        $fileModel->name=$this->filesFM->getName();
+        $fileModel->path=$this->filesFM->getPath();
+
         //Записываем в БД
         $fileId=$this->filesGW->addFile($fileModel);
         //Передаём пользователю id добавленного файла, чтобы он редактировал его в add_info
         $_SESSION['fileId']=$fileId;
     }
-	//Представление
+    //Представление
+    $url=$this->router->pathFor('add_info');
+    $response = $response->withHeader('Location', $url);
     return $this->view->render($response, 'upload_status.html', $args);
 });
 
@@ -55,9 +59,15 @@ $app->get('/add_info', function ($request, $response, $args) {
 $app->post('/add_info', function ($request, $response, $args) {
     $this->logger->info("Button: добавить информацию");
     //Добавляем описание в таблицу
-    $this->filesGW->addDescription($_SESSION['fileId'],$_POST['description']);
-    //Перенаправляем на страницу файла
-    $url=$this->router->pathFor('show_file',['id'=>$_SESSION['fileId']]);
+    if (  (isset($_SESSION['fileId']))  and  (isset($_POST['description'])) ) {
+        $this->filesGW->addDescription($_SESSION['fileId'],$_POST['description']);
+        //Перенаправляем на страницу файла
+        $url=$this->router->pathFor('show_file',['id'=>$_SESSION['fileId']]);
+        
+    }
+    else{
+        $url=$this->router->pathFor('main');
+    }
     $response = $response->withRedirect($url);
     return $response;
 });
@@ -83,7 +93,7 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
     $args=array_merge($args,init_vars($this));
 
     $fileModel=$this->filesGW->getFile($args['id']);
-    if ($fileModel!=NULL) {
+    if ($fileModel) {
         $comments=$this->commentsGW->getComments($args['id']);
         $comments=$this->commentsSorter->sortComments($comments);
 
@@ -96,6 +106,15 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
         $args['comments']=$comments;
         $args['file']=$fileModel;
         $args['fileNameForUrl']=rawurlencode($fileModel->originalName);
+    }
+    else{
+        $args['file']=false;
+        /*
+        //Тут будет вызов 404 на русском
+        $errorPage=$this->notFoundHandler;
+        return $errorPage($request, $response);*/
+        throw new \Slim\Exception\NotFoundException($request,$response);
+
     }
     return $this->view->render($response, 'show_file.html', $args);
 })->setName('show_file');

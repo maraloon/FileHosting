@@ -13,6 +13,7 @@ class FileModel{
 
 	function __construct(){
 		$this->path=date("Y").'/'.date("m").'/'.date("d").'/';
+		//$this->numberOfDownloads=0;
 		//$this->time=time();
 	}
 
@@ -56,7 +57,6 @@ class FileModel{
 	}
 
 	public function getType(){
-
 		$map = array(
 			'image' => 'jpg|jpeg|png|gif',
 			'audio' => 'mp3|ogg|wav|wv|aac|aiff|ape|flac|dts|wma|midi',

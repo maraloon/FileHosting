@@ -10,16 +10,15 @@
 {% block content %}
     {{ parent() }}
         <div class="wrapper">
-              <h1>Drug'n'drop</h1>
               
               <div class="left-column">
                 <!-- D&D Markup -->
                 <div id="drag-and-drop-zone" class="uploader">
-                  <div>Кидать файл сюда</div>
-                  <div class="or">-or-</div>
+                  <div>Перенесите файл сюда</div>
+                  <div class="or">или</div>
                   <div class="browser">
                     <label>
-                      <span>Выбрать файл вручную</span>
+                      <span>Выбрите файл вручную</span>
                       <input type="file" name="files[]" title='Click to add Files'>
                     </label>
                     
@@ -46,7 +45,8 @@
 {% endblock %}
 
 {% block ScriptsAfterBody %}
-    <script src="{{ projectFolder }}/vendor/components/jquery/jquery.js"></script>
+
+    <script src="{{ projectFolder }}/public/js/jquery-3.1.1.min.js"></script>
     <script src="{{ projectFolder }}/public/js/uploader-master/src/dmuploader.min.js"></script>
     <script src="{{ projectFolder }}/public/js/uploader-master/src/settings.js"></script>
 {% endblock %}

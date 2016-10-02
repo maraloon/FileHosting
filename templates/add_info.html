@@ -6,7 +6,7 @@
 {% block content %}
     {{ parent() }}
         <form role="form" class="form-horizontal" method='post' action='add_info'>
-            <input type="text" name="description" placeholder="Описание файла">
+            <input type="text" name="description" placeholder="Описание файла" required>
             <button class="btn btn-primary btn-lg" type="submit">Сохранить</button>
         </form>
 {% endblock %}

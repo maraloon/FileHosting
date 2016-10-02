@@ -21,6 +21,18 @@ $container['view'] = function ($c) {
 };
 
 /**
+ * ErrorHandler
+ */
+/*$container['notFoundHandler'] = function ($c) {
+    return function ($request, $response) use ($c) {
+        return $c['response']
+            ->withStatus(404)
+            ->withHeader('Content-Type', 'text/html')
+            ->write('Kalamba');
+    };
+};*/
+
+/**
  * DataBase PDO Connection
  */
 $container['db'] = function ($c) {
