@@ -1,82 +1,150 @@
 <?php
-use \FileHosting\Models;
-use \FileHosting\Helpers\Helper;
+use FileHosting\Helpers\CodeMessager;
+use FileHosting\Helpers\Helper;
+use FileHosting\Helpers\OutMessager;
+use FileHosting\Models\Comment;
+use FileHosting\Models\File;
+use FileHosting\Models\User;
 
 //Определяем переменные, которые используются в >1 роутере
 function init_vars($container){
-    $vars['projectFolder']=$container->settings['projectFolder'];
+    $vars['pathToPublic']=$container->settings['pathToPublic'];
     return $vars;
 };
 
-$app->get('/', function ($request, $response, $args) {
-    $this->logger->info("Главная страница");
+/**
+ * Главная страница
+ * Представление: Загрузка файла на сервер
+ */
+$app->get('/[message/{code}]', function ($request, $response, $args) {
     $args=array_merge($args,init_vars($this));
+    //Если есть сообщение, формируем его
+    if (isset($args['code'])) {
+        $messager=new CodeMessager();
+        $isValidCode=$messager->setCode($args['code']);
+        if ($isValidCode) {
+            $args['messagers']['messager']=$messager;
+        } 
+    }
+
+    return $this->view->render($response, 'upload_nojs.html', $args); //когда нужно тестировать процесс загрузки
     return $this->view->render($response, 'upload.html', $args);
 })->setName('main');
 
 
 
-
+/**
+ * Процесс: Загрузка файла на сервер
+ */
 $app->post('/upload', function ($request, $response, $args) {
-    $this->logger->info("Button: отправить файл");
-
     //Копируем файл на сервер
-    $args['status']=$this->filesFM->addFile($_FILES['file']['name'],$this->settings['uploadUri']);
+    $status=$this->filesFM->addFile($_FILES['file']['name'],$this->settings['uploadFolder']);
 
-    if ($args['status']) {
+    if ($status) {
         //Создаём модель
-        $fileModel=new Models\FileModel();
+        $fileModel=new File();
         $fileModel->size=$_FILES['file']['size'];
         $fileModel->originalName=$this->filesFM->getOriginalName();
         $fileModel->name=$this->filesFM->getName();
         $fileModel->path=$this->filesFM->getPath();
+        $fileModel->mime=mime_content_type(Helper::getPathForFile($this->settings['uploadFolder'],$fileModel));
+        //Устанавливаем связь файлов с пользователями
+        $userModel=new User();
+        
+        $needNewToken=false;
+        if (isset($_COOKIE['userToken'])) {
+            $userModel->token=$_COOKIE['userToken'];
+            $isValidToken=$userModel->setId($this->usersGW->getIdByToken($_COOKIE['userToken']));
+            if (!$isValidToken) {
+                $needNewToken=true;
+            }
+        }
+        //Добавляем новый токен
+        if ($needNewToken) {
+            $userModel->token=Helper::randHash();
+            setcookie('userToken',$userModel->token);
+            $userModel->setId($this->usersGW->addUser($userModel));
+        }
+
+        $fileModel->userId=$userModel->getId();
 
         //Записываем в БД
         $fileId=$this->filesGW->addFile($fileModel);
-        //Передаём пользователю id добавленного файла, чтобы он редактировал его в add_info
-        $_SESSION['fileId']=$fileId;
+        setcookie('fileId',$fileId);
+
     }
-    //Представление
-    $url=$this->router->pathFor('add_info');
-    $response = $response->withHeader('Location', $url);
-    return $this->view->render($response, 'upload_status.html', $args);
-});
+
+    //Решаем, что вернуть
+    if (isset($_POST['nojs'])) {
+        if ($status){
+            $url=$this->router->pathFor('add_info');
+        }
+        else{
+            $url=$this->router->pathFor('main',['code'=>'upload_failed']);
+        }
+        $response = $response->withRedirect($url);
+        return $response;
+    }
+    return json_encode($status);
+})->setName('upload');
 
 
-
-
-$app->get('/add_info', function ($request, $response, $args) {
-    $this->logger->info("Добавление информации после загрузки");
+/**
+ * Представление: Добавить описание файла после его загрузки
+ * 
+ * Вызывается при onComplete загрузчика dmuploader.js
+ */
+$app->map(['GET', 'POST'],'/add_info', function ($request, $response, $args) {
     $args=array_merge($args,init_vars($this));
+    //Если юзер уже добавил и отправил описание
+    if (  (isset($_COOKIE['userToken']))  and  (isset($_COOKIE['fileId'])) and (isset($_POST['description'])) ) {
 
-    $args['fileId']=$_SESSION['fileId'];
-    return $this->view->render($response, 'add_info.html', $args); 
+        $userId['users']=$this->usersGW->getIdByToken($_COOKIE['userToken']);
+        $userId['files']=$this->filesGW->getFile($_COOKIE['fileId'])->userId;
+
+        //Имеет ли пользователь право добавлять описание
+        if ($userId['users']==$userId['files']) {
+            //Добавляем описание
+            $validErrors=$this->filesValidator->descriptionValidate($_POST['description']);
+            
+            if ($validErrors===true) {
+                $this->filesGW->addDescription($_COOKIE['fileId'],$_POST['description']);
+                //Перенаправляем на страницу файла
+                $url=$this->router->pathFor('show_file',['id'=>$_COOKIE['fileId']]);
+            }
+            else{
+                foreach ($validErrors as $error) {
+                    $messager=new OutMessager();
+                    $messager->setType(OutMessager::TYPE_ERROR);
+                    $messager->setText($error);
+                    $args['messagers'][]=$messager;
+                }
+            }
+
+        }
+        else{
+            //У вас нет прав на изменение данного файла. Вы не его создатель
+            $url=$this->router->pathFor('main',['code'=>'access_denied']);
+        }
+        setcookie('fileId','',time()-3600);
+    }
+
+    //Перенаправить или отобразить
+    if (isset($url)) {
+        $response = $response->withRedirect($url);
+        return $response; 
+    }
+    else{
+        return $this->view->render($response, 'add_info.html', $args);
+    }
 })->setName('add_info');
 
 
 
-
-$app->post('/add_info', function ($request, $response, $args) {
-    $this->logger->info("Button: добавить информацию");
-    //Добавляем описание в таблицу
-    if (  (isset($_SESSION['fileId']))  and  (isset($_POST['description'])) ) {
-        $this->filesGW->addDescription($_SESSION['fileId'],$_POST['description']);
-        //Перенаправляем на страницу файла
-        $url=$this->router->pathFor('show_file',['id'=>$_SESSION['fileId']]);
-        
-    }
-    else{
-        $url=$this->router->pathFor('main');
-    }
-    $response = $response->withRedirect($url);
-    return $response;
-});
-
-
-
-
+/**
+ * Последние загрузки
+ */
 $app->get('/files_list', function ($request, $response, $args){
-    $this->logger->info("Страница последних загрузок");
     $args=array_merge($args,init_vars($this));
 
     $args['uploadUri']=$this->settings['uploadUri'];
@@ -87,16 +155,52 @@ $app->get('/files_list', function ($request, $response, $args){
 
 
 
-
-$app->get('/show_file/{id}', function ($request, $response, $args){
-    $this->logger->info("Просмотр файла");
+/**
+ * Просмотр файла/Добавление комментария
+ */
+$app->map(['GET', 'POST'],'/show_file/{id}', function ($request, $response, $args){
     $args=array_merge($args,init_vars($this));
 
+    //Добавление комментария
+    if (isset($_POST['comment'])) {
+        //Создаём объект Comment
+        $comment=new Comment();
+
+        $comment->text=$_POST['comment'];
+        $comment->fileId=$_POST['fileId'];
+        if (isset($_POST['parentId'])) {
+            $comment->parentId=$_POST['parentId'];
+        } else {
+            $comment->parentId=NULL;
+        }
+        if ($_POST['nick']==NULL) {
+            $comment->nick=Comment::DEFAULT_NICKNAME;
+        } else {
+            $comment->nick=$_POST['nick'];
+        }
+
+
+        //Валидация
+        $validErrors=$this->commentsValidator->validate($comment);
+
+        if ($validErrors===true) {
+            //Записываем в БД
+            $this->commentsGW->addComment($comment);
+        }
+        else{
+            foreach ($validErrors as $error) {
+                $messager=new OutMessager();
+                $messager->setType(OutMessager::TYPE_ERROR);
+                $messager->setText($error);
+                $args['messagers'][]=$messager;
+            }
+        }
+    }
+
+    //Вывод страницы
     $fileModel=$this->filesGW->getFile($args['id']);
     if ($fileModel) {
         $comments=$this->commentsGW->getComments($args['id']);
-        $comments=$this->commentsSorter->sortComments($comments);
-
         $fileUri=Helper::getPathForFile($this->settings['uploadUri'],$fileModel);
         $filePath=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
 
@@ -105,14 +209,10 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
         $args['fileUri']= $fileUri;
         $args['comments']=$comments;
         $args['file']=$fileModel;
-        $args['fileNameForUrl']=rawurlencode($fileModel->originalName);
+        $args['defaultNickname']=Comment::DEFAULT_NICKNAME;
     }
     else{
         $args['file']=false;
-        /*
-        //Тут будет вызов 404 на русском
-        $errorPage=$this->notFoundHandler;
-        return $errorPage($request, $response);*/
         throw new \Slim\Exception\NotFoundException($request,$response);
 
     }
@@ -121,75 +221,83 @@ $app->get('/show_file/{id}', function ($request, $response, $args){
 
 
 
-
+/**
+ * Загрузка файла на устройство
+ */
 $app->get('/download/{id}/{name}', function ($request, $response, $args) {
     $this->logger->info("Загрузка файла");
     //$args=array_merge($args,init_vars($this));
     
     $fileModel=$this->filesGW->getFile($args['id']);
-
     //Счётчик загрузок +1
-    $fileModel=$this->filesGW->incrementNumberOfDownloads($args['id']);
-    /*
-    //Средствами PHP
+    $this->filesGW->incrementNumberOfDownloads($args['id']);
+
+
     $path=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
-    $file=readfile($path);
-    $response = $response->withHeader('Content-Description', 'File Transfer');
-    $response = $response->withHeader('Content-Type', mime_content_type($path));
-    $response = $response->withHeader('Content-Disposition', 'attachment; filename='.$fileModel->originalName);
-    $response = $response->withHeader('Content-Transfer-Encoding', 'binary');
-    $response = $response->withHeader('Expires','0');
-    $response = $response->withHeader('Cache-Control', 'must-revalidate');
-    $response = $response->withHeader('Pragma', 'public');
-    $response = $response->withHeader('Content-Length', filesize($path));
-
-    $body = $response->getBody();
-    $body->write($file);
-    */
-
-
-    //XSendFile
-    $path=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
-    var_dump(realpath($path));
-    var_dump(basename($path));
+    $path=realpath($path);
+    $path=str_replace('\\', '/', $path); //Что-бы и под linux'ом работало
     if (file_exists($path)) {
-        $response = $response->withHeader('X-SendFile', realpath($path));
-        //$response = $response->withHeader('Content-Type','application/octet-stream');
-        //$response = $response->withHeader('Content-Type', mime_content_type($path));
-        $response = $response->withHeader('Content-Disposition','attachment; filename=' . $args['name']);
+        $response = $response->withHeader('Content-Type', mime_content_type($path));
+        //$response = $response->withHeader('Content-Disposition','attachment; filename=' . $args['name']);
 
+        $response = $response->withHeader('Content-Disposition','attachment; filename*'.$args['name']);
+        $response = $response->withHeader('Content-Length', filesize($path));
 
+        if (in_array('mod_xsendfile', apache_get_modules())) {
+            //Средствами XSendFile
+            $response = $response->withHeader('X-SendFile', $path);
+        } else {
+            //Средствами PHP
+            $file=readfile($path);
+
+        /*
+            //Средствами Apache
+            $uri=urlencode(Helper::getPathForFile($this->settings['uploadUri'],$fileModel));
+            $uri=str_replace ( '%2F','/', $uri );
+            $response = $response->withRedirect($uri);
+        */
+        }
     }
-    var_dump($response);
-    /*
-    //Средствами Apache
-    $uri=urlencode(Helper::getPathForFile($this->settings['uploadUri'],$fileModel));
-    $uri=str_replace ( '%2F','/', $uri );
-    $response = $response->withRedirect($uri);*/
-    
 
+    
     return $response;
 })->setName('download');
 
 
 
-
+/**
+ * Добавление комментария
+ */
+/*
 $app->post('/add_comment', function ($request, $response, $args){
     $this->logger->info("Кнопка: комментировать");
 
-//Создаём объект CommentModel
-    $comment=new Models\CommentModel();
+    //Создаём объект Comment
+    $comment=new Comment();
 
     $comment->text=$_POST['comment'];
     $comment->nick=$_POST['nick'];
     $comment->fileId=$_POST['fileId'];
     $comment->parentId=$_POST['parentId'];
- 
-//Записываем в БД
-    $this->commentsGW->addComment($comment);
+
+    //Валидация
+    $validErrors=$this->commentsValidator->validate($comment);
+
+    if ($validErrors===true) {
+        //Записываем в БД
+        $this->commentsGW->addComment($comment);
+    }
+    else{
+        foreach ($validErrors as $error) {
+            $messager=new OutMessager();
+            $messager->setType(OutMessager::TYPE_ERROR);
+            $messager->setText($error);
+            $args['messagers'][]=$messager;
+        }
+    }
 
     //Представление
     $url=$this->router->pathFor('show_file',['id'=>$_POST['fileId']]);
     $response = $response->withHeader('Location', $url);
     return $this->view->render($response, 'show_file.html', $args);
-})->setName('add_comment');
+})->setName('add_comment');*/

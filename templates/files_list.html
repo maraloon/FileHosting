@@ -10,33 +10,33 @@
     {{ parent() }}
 
     {% if files|length == 0 %}
-    	<p>База пуста</p>
+        <p>База пуста</p>
     {% else %}
-		<table border='1'>
-			<thead>
-				<tr>
-					<th>Название</th>
-					<th>Дата</th>
-					<th>Размер</th>
-					<th>Тип</th>
-					<th>Ссылка</th>
-					
-				</tr>
-			</thead>
-			<tbody>
-			{% for file in files %}
-				<tr>
+        <table border='1'>
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Дата</th>
+                    <th>Размер</th>
+                    <th>Тип</th>
+                    <th>Ссылка</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+            {% for file in files %}
+                <tr>
 
-					<td>{{ file.originalName }}</td>
-					<td>{{ file.time }}</td>
-					<td>{{ file.showSize() }}</td>
-					<td>{{ file.getType() }}</td>
-					<td>
-						<a href="{{ path_for('show_file', { 'id': file.getId() }) }}">Скачать</a>
-					</td>
-				</tr>
-			{% endfor %}
-		{% endif %}
-			</tbody>
-		</table>
+                    <td>{{ file.originalName }}</td>
+                    <td>{{ file.time }}</td>
+                    <td>{{ file.showSize() }}</td>
+                    <td>{{ file.getType() }}</td>
+                    <td>
+                        <a href="{{ path_for('show_file', { 'id': file.getId() }) }}">Скачать</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+            </tbody>
+        </table>
 {% endblock %}

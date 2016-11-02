@@ -1,8 +1,12 @@
 <?php
 namespace FileHosting\Helpers;
-class Helper{
 
-    static function getAbsolutePath($file){
+use FileHosting\Models\File;
+class Helper
+{
+
+    static function getAbsolutePath($file)
+    {
         return realpath(__DIR__.'/../../../'.$file);
     }
 
@@ -12,7 +16,8 @@ class Helper{
      * @return string
      */
 
-    static function transliterate($input){
+    static function transliterate($input)
+    {
         $gost = array(
         "Є"=>"YE","І"=>"I","Ѓ"=>"G","і"=>"i","№"=>"-","є"=>"ye","ѓ"=>"g",
         "А"=>"A","Б"=>"B","В"=>"V","Г"=>"G","Д"=>"D",
@@ -33,14 +38,31 @@ class Helper{
         return strtr($input, $gost);
     }
 
-    static function execDisable($fileName){
-        if (preg_match("/^((\w)|(\d)|[ -_])*(.)(php|phtml|html|js)$/iu", $fileName)){
-            $fileName.='.txt';
-        }
-        return $fileName;
+    static function getPathForFile($uploadFolder,File $file)
+    {
+        return $uploadFolder.$file->path.$file->name;
     }
 
-    static function getPathForFile($uploadFolder,$file){
-        return $uploadFolder.$file->path.$file->name;
+    static function randHash($count = 20)
+    {
+        $result='';
+        $array=array_merge(range('a','z'),range('0','9'));
+        for($i=0; $i < $count; $i++){
+            $result.=$array[mt_rand(0,count($array)-1)];
+        }
+        
+        return $result;
+    }
+
+    /**
+     * Добавляет хеш к имени файла, игнорируя разрешение (любой вложенности вроде: archive.tar.gz)
+     * @param string $filename имя файла
+     * @return string name_$hash.format
+     */
+    static function addHashToFileName(string $filename)
+    {
+        $hash=self::randHash(3);
+        //${1} - имя файла; $2 - расширение; 
+        return preg_replace("/([a-zа-я0-9_-]*)(([.][a-z0-9]*)*)/ui", '${1}_'.$hash.'$2', $filename,1);
     }
 }

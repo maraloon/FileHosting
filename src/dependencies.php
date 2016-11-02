@@ -11,7 +11,7 @@ $container['renderer'] = function ($c) {
 
 // view renderer twig
 $container['view'] = function ($c) {
-	$settings = $c->get('settings')['renderer'];
+    $settings = $c->get('settings')['renderer'];
     $view = new \Slim\Views\Twig($settings['templatePath']);
     $view->addExtension(new \Slim\Views\TwigExtension(
         $c['router'],
@@ -23,14 +23,15 @@ $container['view'] = function ($c) {
 /**
  * ErrorHandler
  */
-/*$container['notFoundHandler'] = function ($c) {
+$container['notFoundHandler'] = function ($c) {
     return function ($request, $response) use ($c) {
+        $template=file_get_contents(__DIR__ .'/../templates/not_found.html');
         return $c['response']
             ->withStatus(404)
             ->withHeader('Content-Type', 'text/html')
-            ->write('Kalamba');
+            ->write($template);
     };
-};*/
+};
 
 /**
  * DataBase PDO Connection
@@ -54,17 +55,18 @@ $container['filesGW'] = function ($c) {
     return new \FileHosting\DataBase\FilesTDGW($c['db']);
 };
 
-$container['filesFM'] = function ($c) {
-    return new \FileHosting\FilesFileManager($c['db']);
+$container['usersGW'] = function ($c) {
+    return new \FileHosting\DataBase\UsersTDGW($c['db']);
 };
 
 $container['commentsGW'] = function ($c) {
     return new \FileHosting\DataBase\CommentsTDGW($c['db']);
 };
 
-$container['commentsSorter'] = function ($c) {
-    return new \FileHosting\Models\CommentsSorter();
+$container['filesFM'] = function ($c) {
+    return new \FileHosting\FilesFileManager($c->get('settings')['validTypes']);
 };
+
 
 /**
  * 
@@ -80,4 +82,14 @@ $container['logger'] = function ($c) {
     $logger->pushProcessor(new Monolog\Processor\UidProcessor());
     $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['path'], Monolog\Logger::DEBUG));
     return $logger;
+};
+
+/**
+ * Валидаторы
+ */
+$container['filesValidator'] = function ($c) {
+    return new \FileHosting\Validators\Files();
+};
+$container['commentsValidator'] = function ($c) {
+    return new \FileHosting\Validators\Comments();
 };

@@ -4,22 +4,31 @@
         <meta charset="utf-8"/>
         <title>{% block title %}{% endblock %} - FileHosting</title>
         {% block ScriptsBeforeBody %}
-            <link href="{{ projectFolder }}/public/css/bootstrap/css/bootstrap.css" rel="stylesheet">
-            <link href="{{ projectFolder }}/public/css/user_style.css" rel="stylesheet">
+            <link href="{{ pathToPublic }}/css/bootstrap/css/bootstrap.css" rel="stylesheet">
+            <link href="{{ pathToPublic }}/css/user_style.css" rel="stylesheet">
         {% endblock %}
         
     </head>
     <body>
-    	<div class='container'>
+        <div class='container'>
             <div class='row'>
-            	{% block content %}
-            		<h1>{% block h1 %}{% endblock %}</h1>
-            	{% endblock %}
+                {% block content %}
+                    <h1>{% block h1 %}{% endblock %}</h1>
 
-            	<footer class="navbar-bottom row-fluid text-center">
+                    {% if messagers is defined %}
+                        {% for messager in messagers %}
+                            <div class="message {{ messager.getType() }}">
+                                {{messager.getText()}}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                {% endblock %}
+
+                <footer class="navbar-bottom row-fluid text-center">
                     {% block footer %}
                     <div class="col-md-3">
-        				<a href="{{ path_for('main') }}">Загрузить</a>
+                        <a href="{{ path_for('main') }}">Загрузить</a>
                     </div>
                     <div class="col-md-3">
                         <a href="{{ path_for('files_list') }}">Последние загруженные файлы</a>

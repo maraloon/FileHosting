@@ -1,25 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}Upload{% endblock %}
-{% block ScriptsBeforeBody %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ projectFolder }}/public/css/uploader-master.css" rel="stylesheet" />
-{% endblock %}
 {% block h1 %}Загрузка файлов{% endblock %}
 
 {% block content %}
     {{ parent() }}
         <div class="wrapper">
-          <form role="form" class="form-horizontal" method='post' action='upload' enctype=multipart/form-data>
-            <input type="file" name="file">
+          <form role="form" class="form-horizontal" method='post' action="{{ path_for('upload')}}" enctype=multipart/form-data>
+            <input type="file" name="file" required>
+            <input type="hidden" name="nojs">
             <button class="btn btn-primary btn-lg" type="submit">Загрузить</button>
           </form> 
         </div>
-{% endblock %}
-
-{% block ScriptsAfterBody %}
-
-    <script src="{{ projectFolder }}/public/js/jquery-3.1.1.min.js"></script>
-    <script src="{{ projectFolder }}/public/js/uploader-master/src/dmuploader.min.js"></script>
-    <script src="{{ projectFolder }}/public/js/uploader-master/src/settings.js"></script>
 {% endblock %}

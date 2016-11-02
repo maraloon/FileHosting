@@ -1,26 +1,40 @@
 <?php
 namespace FileHosting\Helpers;
-class ID3Choser{
-
-    public function getTags($filePath,$type){
+class ID3Choser
+{
+    public function getTags($filePath,$type)
+    {
         $ID3Tags=new \getID3;
         $info=$ID3Tags->analyze($filePath);
-
+        
         if ($type=='audio') {
-            $info=$info['tags']['id3v2'];
+            $info=$info["audio"]["streams"][0];
 
-            foreach ($info as $key => $value) { //костыль
-                $info[$key]=$info[$key][0];
-            }
-        }
-        elseif ($type=='video') {
+            $keys = array(
+                'Формат'=>'dataformat',
+                'Кол-во каналов'=>'channels',
+                'Частота дискретизации'=>'sample_rate',
+                'Битрейт'=>'bitrate',
+                'Кодек'=>'codec'
+            );
+        } elseif ($type=='video') {
             $info=$info['video'];
+
+            $keys = array(
+                'Формат'=>'dataformat',
+                'Длина'=>'resolution_x',
+                'Ширина'=>'resolution_y',
+                'Кадров  в секунду'=>'frame_rate',
+            );
+
+        } else {
+            return NULL;
         }
-        else{
-            $info=NULL;
+
+        foreach ($keys as $key => $value) {
+            $tags[$key]=$info[$value];
         }
-        return $info;
+
+        return $tags;
     }
-
-
 }

@@ -3,50 +3,49 @@
 {% block title %}Upload{% endblock %}
 {% block ScriptsBeforeBody %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ projectFolder }}/public/css/uploader-master.css" rel="stylesheet" />
+    <link href="{{ pathToPublic }}/css/uploader-master.css" rel="stylesheet" />
 {% endblock %}
 {% block h1 %}Загрузка файлов{% endblock %}
 
 {% block content %}
     {{ parent() }}
         <div class="wrapper">
-              
-              <div class="left-column">
-                <!-- D&D Markup -->
-                <div id="drag-and-drop-zone" class="uploader">
-                  <div>Перенесите файл сюда</div>
-                  <div class="or">или</div>
-                  <div class="browser">
-                    <label>
-                      <span>Выбрите файл вручную</span>
-                      <input type="file" name="files[]" title='Click to add Files'>
-                    </label>
-                    
-                  </div>
-                </div>
-                <!-- /D&D Markup -->
-              </div>
-              
-              <div id="fileList">
+          <div class="left-column">
+            <!-- D&D Markup -->
+            <div id="drag-and-drop-zone" class="uploader">
+              <div>Перенесите файл сюда</div>
+              <div class="or">или</div>
+              <div class="browser">
+                <label>
+                  <span>Выбрите файл вручную</span>
+                  <input type="file" name="files[]" title='Click to add Files'>
+                </label>
                 
-                <!-- Files will be places here -->
-
               </div>
+            </div>
+            <!-- /D&D Markup -->
+          </div>
               
-              <div id="debug">
-                <h2>Статус загрузки</h2>
-                <div>
-                  <ul>
-                    <!-- Debug lines will be added here -->
-                  </ul>
-                </div>
-              </div>
+          <div id="fileList">          
+            <!-- Files will be places here -->
+          </div>
+
+          <div id="debug">
+            <h2>Статус загрузки</h2>
+            <div>
+              <ul>
+                <!-- Debug lines will be added here -->
+              </ul>
+            </div>
+          </div>
         </div>
+
+
 {% endblock %}
 
 {% block ScriptsAfterBody %}
 
-    <script src="{{ projectFolder }}/public/js/jquery-3.1.1.min.js"></script>
-    <script src="{{ projectFolder }}/public/js/uploader-master/src/dmuploader.min.js"></script>
-    <script src="{{ projectFolder }}/public/js/uploader-master/src/settings.js"></script>
+    <script src="{{ pathToPublic }}/js/jquery-3.1.1.min.js"></script>
+    <script src="{{ pathToPublic }}/js/uploader-master/src/dmuploader.min.js"></script>
+    <script src="{{ pathToPublic }}/js/uploader-master/src/settings.js"></script>
 {% endblock %}

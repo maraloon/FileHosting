@@ -1,6 +1,7 @@
 <?php
 
-$projectFolder='filehosting2';
+//$pathToPublic='filehosting2/public';
+$pathToPublic='';
 
 return [
     'settings' => [
@@ -19,9 +20,18 @@ return [
         ],
 
         //Path of uploaded files
-        'projectFolder'    => "/$projectFolder",
-        'uploadUri'=>"/$projectFolder/public/files/",
+        'pathToPublic'    => "$pathToPublic",
+        //'pathToPublic'    => "$pathToPublic/public/",
+        'uploadUri'=>"$pathToPublic/files/",
         'uploadFolder'=>__DIR__ ."/../public/files/",
+
+        //Типы файлов пропускаемые без фильтрации. К остальным будет добавлено .txt для безопасности
+        'validTypes'=> [
+        'image' => 'jpg|jpeg|png|gif|tiff',
+        'audio' => 'mp3|ogg|wav|wv|aac|aiff|ape|flac|dts|wma|midi',
+        'video' => 'mp4|avi|wmv|webm|3gp',
+        'text' => 'txt|doc|docx|pdf|rtf|xls'
+        ],
 
         //PDO Connection
         'db'=> [

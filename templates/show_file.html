@@ -3,9 +3,9 @@
 {% block title %}Show File{% endblock %}
 
 {% block ScriptsBeforeBody %}
-	{{ parent() }}
-	<script src="{{ projectFolder }}/public/js/uppod.js" type="text/javascript"></script>
-	<script src="{{ projectFolder }}/public/js/helper.js" type="text/javascript"></script>
+    {{ parent() }}
+    <script src="{{ pathToPublic }}/js/uppod.js" type="text/javascript"></script>
+    <script src="{{ pathToPublic }}/js/helper.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block h1 %}Просмотр файла{% endblock %}
@@ -14,77 +14,77 @@
     {{ parent() }}
 
     {% if file == false %}
-    	<p>Такого файла не существует</p>
+        <p>Такого файла не существует</p>
     {% else %}
-		<div class="file_card well">
-			{% if file.getType() == 'image' %}
-				<div class="preview">
-					<img height="100" src="{{ fileUri }}">
-				</div>
-			{% elseif file.getType() == 'audio' or file.getType() == 'video' %}
-				<div class="player" id="uppod_player"></div>
-				<script type="text/javascript">this.player = new Uppod({m:"{{ file.getType() }}",uid:"uppod_player",file:"{{ fileUri }}"});</script>
-			{% endif %}
+        <div class="file_card well">
+            {% if file.getType() == 'image' %}
+                <div class="preview">
+                    <img height="100" src="{{ fileUri }}">
+                </div>
+            {% elseif file.getType() == 'audio' or file.getType() == 'video' %}
+                <div class="player" id="uppod_player"></div>
+                <script type="text/javascript">this.player = new Uppod({m:"{{ file.getType() }}",uid:"uppod_player",file:"{{ fileUri }}"});</script>
+            {% endif %}
 
-			<div>Имя файла: {{ file.originalName }}</div>
-			<div>Описание: {{ file.description }}</div>
-			<div>Время загрузки: {{ file.time }}</div>
-			<div>Размер: {{ file.showSize() }}</div>
-			<div>Скачано: {{ file.numberOfDownloads }}</div>
+            <div>Имя файла: {{ file.originalName }}</div>
+            <div>Описание: {{ file.description }}</div>
+            <div>Время загрузки: {{ file.time }}</div>
+            <div>Размер: {{ file.showSize() }}</div>
+            <div>Скачано: {{ file.numberOfDownloads }}</div>
 
-			{% if id3 !=NULL %}
+            {% if id3 !=NULL %}
 
-				<div class="id3 well">
-					<h3>ID3 Теги</h3>
-					{% for key,value in id3 %}
-						{{ key }}:{{ value }}
-					{% endfor %}
-				</div>
+                <div class="id3 well">
+                    <h3>ID3 Теги</h3>
+                    {% for key,value in id3 %}
+                        <div>{{ key }}: {{ value }}</div>
+                    {% endfor %}
+                </div>
 
-			{% endif %}
-			
-			<div class="download">
-				<form action="{{ path_for('download', { 'id': file.getId(), 'name':fileNameForUrl }) }}">
-    				<button class="btn btn-primary btn-lg" type="submit">Скачать</button>
-				</form>
-			</div>
+            {% endif %}
+            
+            <div class="download">
+                <form action="{{ path_for('download', { 'id': file.getId(), 'name':file.originalName }) }}">
+                    <button class="btn btn-primary btn-lg" type="submit">Скачать</button>
+                </form>
+            </div>
 
-			<div class="comments">
-				<h2>Комментарии</h2>
-					{% if comments==NULL %}
-						Коментариев пока нет. Оставьте первый
-					{% else %}	
-						{% for comment in comments %}
-							<div id="comment_{{ comment.comment.getId() }}" class="deep_{{ comment.deep }}">
-								<p class="comment">
-								{{ comment.comment.time }}
-								
-								{% if comment.comment.nick == NULL %}
-									Anon
-								{% else %}
-									{{ comment.comment.nick }}
-								{% endif %}
+            <div class="comments">
+                <h2>Комментарии</h2>
+                    {% if comments==NULL %}
+                        Коментариев пока нет. Оставьте первый
+                    {% else %}    
+                        {% for comment in comments %}
+                            <div id="comment_{{ comment.getId() }}" class="deep_{{ comment.getDeep() }}">
+                                <p class="comment">
+                                {{ comment.time }}
+                                
+                                {% if comment.nick == NULL %}
+                                    Anon
+                                {% else %}
+                                    {{ comment.nick }}
+                                {% endif %}
 
-								{{ comment.comment.text }}
+                                {{ comment.text }}
 
-								<button onclick="showCommentForm(
-									{{ file.getId() }},
-									{{ comment.comment.getId() }},
-									'{{ path_for('add_comment') }}'
-									);">[>]</button>
-								</p>
-							</div>
-						{% endfor %}
-					{% endif %}
-			</div>
-				<h3>Добавить комментарий к файлу</h3>
-				<form method='post' action="{{ path_for('add_comment') }}">
-					<input type="text" name="comment">
-					<input type="text" name="nick" placeholder="Anon">
-					<input type="hidden" name="fileId" value="{{ file.getId() }}">
-					<button type="submit">Комментировать</button>
-				</form>
-			
-		</div>
-	{% endif %}
+                                <button onclick="showCommentForm(
+                                    {{ file.getId() }},
+                                    {{ comment.getId() }},
+                                    '{{ path_for('show_file', { 'id': file.getId()}) }}'
+                                    );">[>]</button>
+                                </p>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+            </div>
+                <h3>Добавить комментарий к файлу</h3>
+                <form method='post' action="{{ path_for('show_file', { 'id': file.getId()}) }}">
+                    <input type="text" name="comment">
+                    <input type="text" name="nick" placeholder="{{ defaultNickname }}">
+                    <input type="hidden" name="fileId" value="{{ file.getId() }}">
+                    <button type="submit">Комментировать</button>
+                </form>
+            
+        </div>
+    {% endif %}
 {% endblock %}
