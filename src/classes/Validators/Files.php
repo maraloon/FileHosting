@@ -1,8 +1,10 @@
 <?php
 namespace FileHosting\Validators;
+use FileHosting\Models\File;
+
 class Files extends Validator{
     public function descriptionValidate($description){
-        $length=3000;
+        $length=File::DESCRIPTION_MAX_LENGTH;
         if (mb_strlen($description)<=$length) {
             return true;
         }

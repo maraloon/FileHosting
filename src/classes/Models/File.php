@@ -11,6 +11,8 @@ class File{
     public $numberOfDownloads;
     public $description;
     public $userId;
+    
+    const DESCRIPTION_MAX_LENGTH=3000;
 
     public function setId($id){
         $this->id=$id;

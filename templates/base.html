@@ -17,7 +17,7 @@
 
                     {% if messagers is defined %}
                         {% for messager in messagers %}
-                            <div class="message {{ messager.getType() }}">
+                            <div class="alert alert-{{ messager.getType() }}">
                                 {{messager.getText()}}
                             </div>
                         {% endfor %}

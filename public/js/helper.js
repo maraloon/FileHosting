@@ -7,7 +7,7 @@
     <input type="text" name="nick" placeholder="Anon">\
     <input type="hidden" name="parentId" value="'+parentId+'"">\
     <input type="hidden" name="fileId" value="'+fileId+'">\
-    <button type="submit">Ответить на коммент</button>';  
+    <button class="btn btn-success btn-sm" type="submit">Ответить на комментарий</button>';
     // добавление в конец
     commentDiv.appendChild(commentForm);
 }

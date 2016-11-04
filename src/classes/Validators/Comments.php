@@ -11,15 +11,15 @@ class Comments extends Validator
             'type'=>'string',
             'regexp'=>"//",
             'min' => 1,
-            'max' => 5000,
+            'max' => Comment::COMMENT_MAX_LENGTH,
             'name' => 'Текст комментария',
-            'message' => 'должен состоять из любых символов'
+            'message' => 'может состоять из любых символов' //по-идее, это никогда не выводится
         ),
         'nick'=>array(
             'type'=>'string',
             'regexp'=>"/^([a-z0-9][-]*)+$/iu",
             'min' => 1,
-            'max' => 30,
+            'max' => Comment::NICKNAME_MAX_LENGTH,
             'name' => 'Ник',
             'message' => 'должен состоять из латиницы и цифр, может содержать знак "-"'
         ),
@@ -68,15 +68,6 @@ class Comments extends Validator
 
             }
         }
-
-/*
-
-        $length=$this->masks['text']['max'];
-        if (mb_strlen($comment->text)<=$length) {
-            return true;
-        }
-        $this->errors[]='Длина комментария превышает '.$length.' знаков';
-*/        
 
 
         if (empty($e)) {

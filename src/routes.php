@@ -27,7 +27,7 @@ $app->get('/[message/{code}]', function ($request, $response, $args) {
         } 
     }
 
-    return $this->view->render($response, 'upload_nojs.html', $args); //когда нужно тестировать процесс загрузки
+    //return $this->view->render($response, 'upload_nojs.html', $args); //когда нужно тестировать процесс загрузки
     return $this->view->render($response, 'upload.html', $args);
 })->setName('main');
 
@@ -129,6 +129,7 @@ $app->map(['GET', 'POST'],'/add_info', function ($request, $response, $args) {
         setcookie('fileId','',time()-3600);
     }
 
+    $args['descriptionMaxLength']=File::DESCRIPTION_MAX_LENGTH;
     //Перенаправить или отобразить
     if (isset($url)) {
         $response = $response->withRedirect($url);
@@ -262,42 +263,3 @@ $app->get('/download/{id}/{name}', function ($request, $response, $args) {
     
     return $response;
 })->setName('download');
-
-
-
-/**
- * Добавление комментария
- */
-/*
-$app->post('/add_comment', function ($request, $response, $args){
-    $this->logger->info("Кнопка: комментировать");
-
-    //Создаём объект Comment
-    $comment=new Comment();
-
-    $comment->text=$_POST['comment'];
-    $comment->nick=$_POST['nick'];
-    $comment->fileId=$_POST['fileId'];
-    $comment->parentId=$_POST['parentId'];
-
-    //Валидация
-    $validErrors=$this->commentsValidator->validate($comment);
-
-    if ($validErrors===true) {
-        //Записываем в БД
-        $this->commentsGW->addComment($comment);
-    }
-    else{
-        foreach ($validErrors as $error) {
-            $messager=new OutMessager();
-            $messager->setType(OutMessager::TYPE_ERROR);
-            $messager->setText($error);
-            $args['messagers'][]=$messager;
-        }
-    }
-
-    //Представление
-    $url=$this->router->pathFor('show_file',['id'=>$_POST['fileId']]);
-    $response = $response->withHeader('Location', $url);
-    return $this->view->render($response, 'show_file.html', $args);
-})->setName('add_comment');*/

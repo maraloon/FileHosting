@@ -11,6 +11,8 @@ class Comment{
     public $time;
 
     const DEFAULT_NICKNAME='Anon';
+    const NICKNAME_MAX_LENGTH=30;
+    const COMMENT_MAX_LENGTH=5000;
 
     function __construct(){
     }

@@ -89,9 +89,14 @@ class CommentsTDGW{
                 ");
             $rows->bindValue(':fileId', $comment->fileId, \PDO::PARAM_INT);
             $rows->execute();
-            var_dump($rows);
+
             $lastCommentPath=$rows->fetchColumn();
-            return $this->incrementPath($lastCommentPath);
+
+            if ($lastCommentPath){
+                return $this->incrementPath($lastCommentPath);
+            }
+            //Если еще нет ни одного коммента к файлу
+            return '000';
         }
 
     }

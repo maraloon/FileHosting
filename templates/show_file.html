@@ -56,33 +56,50 @@
                     {% else %}    
                         {% for comment in comments %}
                             <div id="comment_{{ comment.getId() }}" class="deep_{{ comment.getDeep() }}">
-                                <p class="comment">
-                                {{ comment.time }}
-                                
-                                {% if comment.nick == NULL %}
-                                    Anon
-                                {% else %}
-                                    {{ comment.nick }}
-                                {% endif %}
+                                <div class="panel panel-primary">
 
-                                {{ comment.text }}
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            {% if comment.nick == NULL %}
+                                            Anon
+                                            {% else %}
+                                            {{ comment.nick }}
+                                            {% endif %}
 
-                                <button onclick="showCommentForm(
-                                    {{ file.getId() }},
-                                    {{ comment.getId() }},
-                                    '{{ path_for('show_file', { 'id': file.getId()}) }}'
-                                    );">[>]</button>
-                                </p>
+                                            {{ comment.time }}
+
+                                            <button class="btn btn-success btn-xs" onclick="showCommentForm(
+                                                {{ file.getId() }},
+                                                {{ comment.getId() }},
+                                                '{{ path_for('show_file', { 'id': file.getId()}) }}'
+                                                );">ответить
+                                            </button>
+                                        </h3>
+                                    </div>
+
+                                    <div class="panel-body">
+                                        {{ comment.text }}
+                                    </div>
+                                </div>
                             </div>
                         {% endfor %}
                     {% endif %}
             </div>
                 <h3>Добавить комментарий к файлу</h3>
                 <form method='post' action="{{ path_for('show_file', { 'id': file.getId()}) }}">
-                    <input type="text" name="comment">
-                    <input type="text" name="nick" placeholder="{{ defaultNickname }}">
+
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="sizing-addon3">@</span>
+                        <input type="text" name="nick" class="form-control" placeholder="Никнейм. ('{{ defaultNickname }}', если не заполнено)" aria-describedby="sizing-addon3">
+                    </div>
+
+                    <div class="input-group">
+                        <textarea maxlength="5000" name="comment" required class="comment form-control" placeholder="Текст комментария"></textarea>
+                    </div>
+
                     <input type="hidden" name="fileId" value="{{ file.getId() }}">
-                    <button type="submit">Комментировать</button>
+                    <button type="submit" class="btn btn-success btn-sm">Комментировать</button>
                 </form>
             
         </div>
