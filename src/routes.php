@@ -27,7 +27,7 @@ $app->get('/[message/{code}]', function ($request, $response, $args) {
         } 
     }
 
-    //return $this->view->render($response, 'upload_nojs.html', $args); //когда нужно тестировать процесс загрузки
+    return $this->view->render($response, 'upload_nojs.html', $args); //когда нужно тестировать процесс загрузки
     return $this->view->render($response, 'upload.html', $args);
 })->setName('main');
 
@@ -47,23 +47,29 @@ $app->post('/upload', function ($request, $response, $args) {
         $fileModel->originalName=$this->filesFM->getOriginalName();
         $fileModel->name=$this->filesFM->getName();
         $fileModel->path=$this->filesFM->getPath();
-        $fileModel->mime=mime_content_type(Helper::getPathForFile($this->settings['uploadFolder'],$fileModel));
+
+        $filePath=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
+        $fileModel->mime=mime_content_type($filePath);
+        $fileModel->mediaInfo=$this->ID3Choser->getJSONInfo($filePath,$fileModel->getType());
+
         //Устанавливаем связь файлов с пользователями
         $userModel=new User();
         
-        $needNewToken=false;
+        //Если есть какой-то токен
         if (isset($_COOKIE['userToken'])) {
             $userModel->token=$_COOKIE['userToken'];
-            $isValidToken=$userModel->setId($this->usersGW->getIdByToken($_COOKIE['userToken']));
-            if (!$isValidToken) {
-                $needNewToken=true;
+            $isValidToken=$this->usersGW->getIdByToken($_COOKIE['userToken']);
+            //Если в базе тоже такой токен есть
+            if ($isValidToken) {
+                $userModel->setId($isValidToken);
             }
-        }
-        //Добавляем новый токен
-        if ($needNewToken) {
-            $userModel->token=Helper::randHash();
-            setcookie('userToken',$userModel->token);
-            $userModel->setId($this->usersGW->addUser($userModel));
+            //Нам втирают какую-то дич вместо токена
+            else{
+                //Никаких сообщений об ошибках и взломах, молча создаём новый токен
+                $userModel->token=Helper::randHash();
+                setcookie('userToken',$userModel->token);
+                $userModel->setId($this->usersGW->addUser($userModel));
+            }
         }
 
         $fileModel->userId=$userModel->getId();
@@ -203,10 +209,11 @@ $app->map(['GET', 'POST'],'/show_file/{id}', function ($request, $response, $arg
     if ($fileModel) {
         $comments=$this->commentsGW->getComments($args['id']);
         $fileUri=Helper::getPathForFile($this->settings['uploadUri'],$fileModel);
-        $filePath=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
 
-        $args['id3']=$this->ID3Choser->getTags($filePath,$fileModel->getType());
-
+        if ($fileModel->mediaInfo!=NULL) {
+            $args['id3']=$this->ID3Choser->replaceKeys($fileModel->getMediaInfoArray(),$fileModel->getType());
+        }
+        
         $args['fileUri']= $fileUri;
         $args['comments']=$comments;
         $args['file']=$fileModel;
@@ -217,6 +224,10 @@ $app->map(['GET', 'POST'],'/show_file/{id}', function ($request, $response, $arg
         throw new \Slim\Exception\NotFoundException($request,$response);
 
     }
+
+    $args['nicknameMaxLength']=Comment::NICKNAME_MAX_LENGTH;
+    $args['commentMaxLength']=Comment::COMMENT_MAX_LENGTH;
+
     return $this->view->render($response, 'show_file.html', $args);
 })->setName('show_file');
 

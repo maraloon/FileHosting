@@ -28,6 +28,17 @@ textarea.comment {
     padding-left: 210px;
 }
 
+.panel{
+    overflow:hidden;
+    width:300px;
+}
+.panel-body {
+  padding: 3px;
+}
+.panel-heading {
+  padding: 1px 5px;
+}
+
 .message {
     border: 1px solid #2a6478; /* Белая рамка */
     border-radius: 5px; /* Радиус скругления */

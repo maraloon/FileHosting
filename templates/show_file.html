@@ -35,7 +35,7 @@
             {% if id3 !=NULL %}
 
                 <div class="id3 well">
-                    <h3>ID3 Теги</h3>
+                    <h3>ID3 Теги </h3>
                     {% for key,value in id3 %}
                         <div>{{ key }}: {{ value }}</div>
                     {% endfor %}
@@ -49,59 +49,46 @@
                 </form>
             </div>
 
-            <div class="comments">
-                <h2>Комментарии</h2>
-                    {% if comments==NULL %}
-                        Коментариев пока нет. Оставьте первый
-                    {% else %}    
-                        {% for comment in comments %}
-                            <div id="comment_{{ comment.getId() }}" class="deep_{{ comment.getDeep() }}">
-                                <div class="panel panel-primary">
+            <h2>Комментарии</h2>
+            <div class="comments" id="comments">
+                {% if comments==NULL %}
+                    Коментариев пока нет. Оставьте первый
+                {% else %}    
+                    {% for comment in comments %}
+                        <div id="comment_{{ comment.getId() }}" class="deep_{{ comment.getDeep() }}">
+                            <div class="panel panel-primary">
 
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">
-                                            {% if comment.nick == NULL %}
-                                            Anon
-                                            {% else %}
-                                            {{ comment.nick }}
-                                            {% endif %}
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        {% if comment.nick == NULL %}
+                                        Anon
+                                        {% else %}
+                                        {{ comment.nick }}
+                                        {% endif %}
 
-                                            {{ comment.time }}
+                                        {{ comment.time }}
 
-                                            <button class="btn btn-success btn-xs" onclick="showCommentForm(
-                                                {{ file.getId() }},
-                                                {{ comment.getId() }},
-                                                '{{ path_for('show_file', { 'id': file.getId()}) }}'
-                                                );">ответить
-                                            </button>
-                                        </h3>
-                                    </div>
+                                        <button class="btn btn-success btn-xs" onclick="showCommentFormReply({{ comment.getId() }});">
+                                            ответить
+                                        </button>
+                                    </h3>
+                                </div>
 
-                                    <div class="panel-body">
-                                        {{ comment.text }}
-                                    </div>
+                                <div class="panel-body">
+                                    {{ comment.text }}
                                 </div>
                             </div>
-                        {% endfor %}
-                    {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
-                <h3>Добавить комментарий к файлу</h3>
-                <form method='post' action="{{ path_for('show_file', { 'id': file.getId()}) }}">
 
+            <h3>Добавить комментарий к файлу</h3>
+            <div id="add_comment">
+            </div>
 
-                    <div class="input-group">
-                        <span class="input-group-addon" id="sizing-addon3">@</span>
-                        <input type="text" name="nick" class="form-control" placeholder="Никнейм. ('{{ defaultNickname }}', если не заполнено)" aria-describedby="sizing-addon3">
-                    </div>
+            {% include 'comment_form.html' %}
 
-                    <div class="input-group">
-                        <textarea maxlength="5000" name="comment" required class="comment form-control" placeholder="Текст комментария"></textarea>
-                    </div>
-
-                    <input type="hidden" name="fileId" value="{{ file.getId() }}">
-                    <button type="submit" class="btn btn-success btn-sm">Комментировать</button>
-                </form>
-            
         </div>
     {% endif %}
 {% endblock %}

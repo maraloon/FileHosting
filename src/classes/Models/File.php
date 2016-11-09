@@ -1,5 +1,6 @@
 <?php
 namespace FileHosting\Models;
+
 class File{
     protected $id;
     public $name;
@@ -7,6 +8,7 @@ class File{
     public $path;
     public $size;
     public $mime;
+    public $mediaInfo;
     public $time;
     public $numberOfDownloads;
     public $description;
@@ -46,6 +48,10 @@ class File{
             return $mb.' Mb';
         }
         return $kb.' Kb';
+    }
+
+    public function getMediaInfoArray(){
+        return json_decode($this->mediaInfo,true);
     }
 
     public function getType(){
