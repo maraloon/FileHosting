@@ -11,37 +11,47 @@
     </head>
     <body>
         <div class='container'>
-            <div class='row'>
-                {% block content %}
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-10">
                     <h1>{% block h1 %}{% endblock %}</h1>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-10">
+                    {% block content %}                
 
-                    {% if messagers is defined %}
-                        {% for messager in messagers %}
-                            <div class="alert alert-{{ messager.getType() }}">
+                        {% if messagers is defined %}
+                            {% for messager in messagers %}
+                            <div class="alert alert-{{ messager.getType() }}" role="alert">
                                 {{messager.getText()}}
                             </div>
-                        {% endfor %}
-                    {% endif %}
+                            {% endfor %}
+                        {% endif %}
 
-                {% endblock %}
-
-                <footer class="navbar-bottom row-fluid text-center">
-                    {% block footer %}
-                    <div class="col-md-3">
-                        <a href="{{ path_for('main') }}">Загрузить</a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href="{{ path_for('files_list') }}">Последние загруженные файлы</a>
-                    </div>
-                    <div class="col-md-3">
-                         <a href='https://gist.github.com/codedokode/9424217'>Техническое задание</a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href='https://github.com/TheSidSpears/FileHosting'>Git</a> проекта
-                    </div>
                     {% endblock %}
-                </footer>
+                </div>
+                <div class="col-xs-6 col-md-2">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li>
+                            <a href="{{ path_for('main') }}">Загрузить</a>
+                        </li>
+                        <li>
+                            <a href="{{ path_for('files_list') }}">Последние загруженные файлы</a>
+                        </li>
+                    </ul>
+                </div>
+
+
             </div>
+            <footer class="navbar-bottom row-fluid text-center">
+                {% block footer %}
+                <div class="col-md-6">
+                    <a href='https://gist.github.com/codedokode/9424217'>Техническое задание</a>
+                </div>
+                <div class="col-md-6">
+                    <a href='https://github.com/TheSidSpears/FileHosting'>Git</a> проекта
+                </div>
+                {% endblock %}
+            </footer>
+
         </div>
 
         {% block ScriptsAfterBody %}{% endblock %}

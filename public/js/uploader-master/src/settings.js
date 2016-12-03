@@ -34,7 +34,7 @@ function update_file_progress(id, percent)
 
 // Upload Plugin itself
 $('#drag-and-drop-zone').dmUploader({
-  url: 'upload',
+  url: '/upload',
   dataType: 'json',
   allowedTypes: '*',
   maxFiles:0,
@@ -66,7 +66,7 @@ $('#drag-and-drop-zone').dmUploader({
       add_log('Server Response for file #' + id + ': ' + 'Upload Successed');
       update_file_status(id, 'success', 'Upload Complete');
       update_file_progress(id, '100%');
-      window.location.replace('add_info');
+      window.location.replace('/add_info');
     }
     else{
       add_log('Server Response for file #' + id + ': ' + 'Upload Failed');

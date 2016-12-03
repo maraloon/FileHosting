@@ -48,6 +48,10 @@ class FilesFileManager
         return false;
     }
 
+    function deleteFile($path){
+        return unlink($path);
+    }
+
     public function getPath()
     {
         return $this->path;

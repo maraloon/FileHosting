@@ -2,10 +2,10 @@ footer {
   padding: 40px;
 }
 
-textarea.comment {
+textarea .comment {
     resize: none
 }
-
+/*Глубина комментариев*/
 .deep_1 {
     padding-left: 30px;
 }
@@ -34,21 +34,47 @@ textarea.comment {
 }
 .panel-body {
   padding: 3px;
+  height: auto;
+  overflow: auto;
+  word-wrap: break-word;
 }
 .panel-heading {
   padding: 1px 5px;
 }
 
-.message {
-    border: 1px solid #2a6478; /* Белая рамка */
-    border-radius: 5px; /* Радиус скругления */
+.thumbnail-col{
+    height: 370px;
 }
-.message.success{
-    background: #6c6;
+
+.thumbnail{
+    height: 355px;
 }
-.message.warning{
-    background: #ff9;
+
+/*Ограничиваем длину описания*/
+.caption p{
+    min-height: 6.5em;
+    max-height: 6.5em; /*2 строки*/
+    overflow: hidden;
+    text-overflow: clip;
 }
-.message.error{
-    background: #f66;
+
+    /*Текст в превью*/
+.thumbnail .caption{
+    overflow: hidden;
+}
+
+.preview{
+    background-color: #eee;
+    height: 196px;
+}
+
+.preview img{
+    width: 100%;
+}
+.filecard_preview img{
+    width: 20%;
+}
+
+.preview .glyphicon-preview{
+    font-size:196px;
 }

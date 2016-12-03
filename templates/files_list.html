@@ -12,31 +12,40 @@
     {% if files|length == 0 %}
         <p>База пуста</p>
     {% else %}
-        <table border='1'>
-            <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Дата</th>
-                    <th>Размер</th>
-                    <th>Тип</th>
-                    <th>Ссылка</th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-            {% for file in files %}
-                <tr>
 
-                    <td>{{ file.originalName }}</td>
-                    <td>{{ file.time }}</td>
-                    <td>{{ file.showSize() }}</td>
-                    <td>{{ file.getType() }}</td>
-                    <td>
-                        <a href="{{ path_for('show_file', { 'id': file.getId() }) }}">Скачать</a>
-                    </td>
-                </tr>
+            {% for file in files %}
+                <div class="col-sm-6 col-md-3 thumbnail-col">
+                    <div class="thumbnail">
+                        <div class="preview">
+                            {% if file.getType() == 'image' %}
+                                <img src="{{ uploadUri }}{{ file.path }}{{ file.name }}">
+                            {% elseif  file.getType() == 'audio' %}
+                                <span class="glyphicon glyphicon-music glyphicon-preview"></span>
+                            {% elseif  file.getType() == 'video' %}
+                                <span class="glyphicon glyphicon-film glyphicon-preview"></span>
+                            {% elseif  file.getType() == 'text' %}
+                            <span class="glyphicon glyphicon-text-color glyphicon-preview"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-question-sign glyphicon-preview"></span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="caption">
+
+                            <p>
+                                <strong>Имя файла: </strong>{{ file.originalName }}
+                                <strong>Описание: </strong>{{ file.description }}
+                            </p>
+
+                            <p>
+
+                                <a href="{{ path_for('show_file', { 'id': file.getId() }) }}" class="btn btn-default" role="button">Показать</a>
+
+                                <a href="{{ path_for('download', { 'id': file.getId(), 'name':file.originalName }) }}" class="btn btn-primary" role="button">Скачать</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-        {% endif %}
-            </tbody>
-        </table>
+    {% endif %}
 {% endblock %}

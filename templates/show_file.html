@@ -12,14 +12,14 @@
 
 {% block content %}
     {{ parent() }}
-
+    
     {% if file == false %}
         <p>Такого файла не существует</p>
     {% else %}
         <div class="file_card well">
             {% if file.getType() == 'image' %}
-                <div class="preview">
-                    <img height="100" src="{{ fileUri }}">
+                <div class="filecard_preview">
+                    <img src="{{ fileUri }}">
                 </div>
             {% elseif file.getType() == 'audio' or file.getType() == 'video' %}
                 <div class="player" id="uppod_player"></div>
@@ -43,11 +43,23 @@
 
             {% endif %}
             
-            <div class="download">
-                <form action="{{ path_for('download', { 'id': file.getId(), 'name':file.originalName }) }}">
-                    <button class="btn btn-primary btn-lg" type="submit">Скачать</button>
+            <form action="{{ path_for('download', { 'id': file.getId(), 'name':file.originalName }) }}">
+                <button class="btn btn-primary btn-lg" type="submit">Скачать</button>
+            </form>
+
+            {% if delete %}
+                <p>
+                <form>
+                    <a class="btn btn-primary btn-lg" type="submit" 
+                    onclick="
+                    if (confirm('Подтвердите удаление файла. Удаление необратимо! Мир никогда не станет прежним. Подумай...')){
+                        window.location = '{{ path_for('delete', { 'id': file.getId() }) }}';
+                    }
+                    ;"
+                    >Удалить</a>
                 </form>
-            </div>
+                </p>
+            {% endif %}
 
             <h2>Комментарии</h2>
             <div class="comments" id="comments">

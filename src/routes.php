@@ -27,7 +27,7 @@ $app->get('/[message/{code}]', function ($request, $response, $args) {
         } 
     }
 
-    return $this->view->render($response, 'upload_nojs.html', $args); //когда нужно тестировать процесс загрузки
+    //return $this->view->render($response, 'upload_nojs.html', $args); //когда нужно тестировать процесс загрузки
     return $this->view->render($response, 'upload.html', $args);
 })->setName('main');
 
@@ -213,7 +213,15 @@ $app->map(['GET', 'POST'],'/show_file/{id}', function ($request, $response, $arg
         if ($fileModel->mediaInfo!=NULL) {
             $args['id3']=$this->ID3Choser->replaceKeys($fileModel->getMediaInfoArray(),$fileModel->getType());
         }
-        
+
+        //Если файл загружен пользователем, он имеет право удалить его
+        $userId['users']=$this->usersGW->getIdByToken($_COOKIE['userToken']);
+        $userId['files']=$fileModel->userId;
+        $args['delete']=false;
+        if ($userId['users']==$userId['files']) {
+            $args['delete']=true;
+        }
+
         $args['fileUri']= $fileUri;
         $args['comments']=$comments;
         $args['file']=$fileModel;
@@ -227,7 +235,6 @@ $app->map(['GET', 'POST'],'/show_file/{id}', function ($request, $response, $arg
 
     $args['nicknameMaxLength']=Comment::NICKNAME_MAX_LENGTH;
     $args['commentMaxLength']=Comment::COMMENT_MAX_LENGTH;
-
     return $this->view->render($response, 'show_file.html', $args);
 })->setName('show_file');
 
@@ -274,3 +281,44 @@ $app->get('/download/{id}/{name}', function ($request, $response, $args) {
     
     return $response;
 })->setName('download');
+
+/**
+ * Удаление файла
+ */
+$app->get('/delete/{id}', function ($request, $response, $args) {
+    $this->logger->info("Удаление файла");
+
+    $fileModel=$this->filesGW->getFile($args['id']);
+    //Если файл загружен пользователем, он имеет право удалить его
+    $userId['users']=$this->usersGW->getIdByToken($_COOKIE['userToken']);
+    $userId['files']=$fileModel->userId;
+
+    if ($userId['users']==$userId['files']) {
+        //Удалить из ФС
+        $filePath=Helper::getPathForFile($this->settings['uploadFolder'],$fileModel);
+        $deletedFromFS=$this->filesFM->deleteFile($filePath);
+
+        if ($deletedFromFS){
+            $this->logger->info("Файл ".$args['id']." удалён из ФС");
+            //Удалить из БД
+            $deletedFromDB=$this->filesGW->deleteFile($args['id']);
+
+            if ($deletedFromDB){
+                $this->logger->info("Файл ".$args['id']." удалён из БД");
+                $url=$this->router->pathFor('main',['code'=>'file_deleted']);
+            }
+            else{
+                $this->logger->info("Файл ".$args['id']." НЕ удалён из БД");
+                $url=$this->router->pathFor('main',['code'=>'file_not_deleted_from_db']);
+            }
+
+        }
+        else{
+            $this->logger->info("Файл ".$args['id']." НЕ удалён из ФС");
+            $url=$this->router->pathFor('main',['code'=>'file_not_deleted_from_fs']);
+        }
+    }
+
+    $response = $response->withRedirect($url);
+    return $response;
+})->setName('delete');

@@ -32,6 +32,15 @@ class FilesTDGW{
         return $this->db->lastInsertId();
     }
 
+    public function deleteFile($id){
+        $SqlString="DELETE FROM `files`
+                WHERE `id`=:id";
+
+        $rows = $this->db->prepare($SqlString);
+        $rows->bindValue(':id', $id, \PDO::PARAM_INT);
+        return $rows->execute();
+    }
+
     public function addDescription(int $id, $description){
         $SqlString="UPDATE `files`
                 SET `description`=:description

@@ -8,7 +8,10 @@ class CodeMessager extends Messager{
     private $messages = array(
         'upload_failed' =>array(self::TYPE_ERROR,'Загрузка не удалась'),
         'access_denied' =>array(self::TYPE_ERROR,'У вас нет прав на изменение данного файла. Вы не его создатель'),
-        'token_not_valid' =>array(self::TYPE_ERROR,'Ошибка идентификации. Почистите куки')  
+        'token_not_valid' =>array(self::TYPE_ERROR,'Ошибка идентификации. Почистите куки'),
+        'file_not_deleted_from_db' =>array(self::TYPE_ERROR,'Файл не удалён из БД'),
+        'file_not_deleted_from_fs' =>array(self::TYPE_ERROR,'Файл не удалён из ФС'),
+        'file_deleted' =>array(self::TYPE_SUCCESS,'Файл удалён')
     );
     /**
      * $code код сообщения из массива $messages
